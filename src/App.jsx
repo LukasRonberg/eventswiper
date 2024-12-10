@@ -1,10 +1,11 @@
-import { styled, ThemeProvider } from 'styled-components'
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Outlet } from 'react-router-dom';
-import './App.css'
-import theme from './util/theme'
-import LogIn from './pages/Login';
-import facade from './util/apiFacade';
+import { styled, ThemeProvider } from "styled-components";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
+import "./App.css";
+import theme from "./util/theme";
+import LogIn from "./pages/Login";
+import Register from "./pages/Register";
+import facade from "./util/apiFacade";
 
 const Content = styled.div`
   display: flex;
@@ -13,13 +14,12 @@ const Content = styled.div`
   color: #333;
 `;
 
-
 const MainContent = styled.div`
   flex: 1;
   padding: 20px;
   background-color: #fafafa;
   border-left: 2px solid #ccc;
-   /* Allows scrolling inside the main content if needed */
+  /* Allows scrolling inside the main content if needed */
 `;
 
 const ErrorBanner = styled.div`
@@ -30,11 +30,11 @@ const ErrorBanner = styled.div`
   border-radius: 5px;
 `;
 
-
 function App() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [showRenderError, setShowRenderError] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -48,22 +48,30 @@ function App() {
   const logout = () => {
     facade.logout();
     setLoggedIn(false);
-   } 
-   const login = (user, pass) => {
-    facade.login(user,pass).then(() => setLoggedIn(true))
-   } 
+  };
+
+  const login = (user, pass) => {
+    facade.login(user, pass).then(() => setLoggedIn(true));
+  };
 
   return (
     <ThemeProvider theme={theme}>
-     {!loggedIn ? (<LogIn login={login} />) :
-      <Content>
-        <MainContent>
-          {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-          <Outlet />
-        </MainContent>
-      </Content> }
+      {!loggedIn ? (
+        isRegistering ? (
+          <Register onSwitchToLogin={() => setIsRegistering(false)} />
+        ) : (
+          <LogIn login={login} onSwitchToRegister={() => setIsRegistering(true)} setIsRegistering={setIsRegistering} />
+        )
+      ) : (
+        <Content>
+          <MainContent>
+            {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
+            <Outlet />
+          </MainContent>
+        </Content>
+      )}
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;

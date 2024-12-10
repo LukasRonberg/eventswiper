@@ -1,4 +1,4 @@
-const URL = "http://eventapi.lukasronberg.dk/api";
+const URL = "https://eventapi.lukasronberg.dk/api";
 
 function handleHttpErrors(res) {
 if (!res.ok) {
@@ -29,6 +29,19 @@ const login = (username, password) => {
         .then(handleHttpErrors)
         .then(res => {setToken(res.token) })   
 }
+
+const register = (username, password, age, phone, email) => {
+  const options = makeOptions("POST", false, { username, password, age, phone, email });
+  return fetch(`${URL}/auth/register`, options)
+    .then(handleHttpErrors)
+    .catch(error => {
+      console.error("Registration failed:", error);
+      throw error;
+    });
+};
+
+
+
 
 const getUserRoles = () => {
     const token = getToken()
@@ -90,7 +103,8 @@ return {
     fetchDataForAllEvents,
     hasUserAccess,
     getUserById,
-    getDriverById
+    getDriverById,
+    register
 }
 }
 const facade = apiFacade();

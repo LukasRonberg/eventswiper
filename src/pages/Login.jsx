@@ -2,7 +2,7 @@
 import { useState } from "react"
 
 
-function LogIn({ login }) {
+function LogIn({ login, onSwitchToRegister, setIsRegistering }) {
   const init = { username: "", password: "" };
   const [loginCredentials, setLoginCredentials] = useState(init);
 
@@ -10,6 +10,7 @@ function LogIn({ login }) {
     evt.preventDefault();
     
     login(loginCredentials.username, loginCredentials.password);
+    setIsRegistering(false);
   }
   const onChange = (evt) => {
     setLoginCredentials({ ...loginCredentials,[evt.target.id]: evt.target.value })
@@ -23,6 +24,7 @@ function LogIn({ login }) {
         <input placeholder="Password" id="password" onChange={onChange} value={loginCredentials.password} />
         <button type="submit">Login</button>
       </form>
+      <button onClick={onSwitchToRegister}>Don't have an account? Register</button>
     </div>
   )
 }
