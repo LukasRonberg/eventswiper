@@ -62,6 +62,7 @@ const fetchDataForAllEvents = () => {
     const options = makeOptions("GET",true); //True add's the token
 return fetch(URL + "/event", options).then(handleHttpErrors);
 }
+
 const fetchDataForSpecificEvent = (eventId) => { 
   const options = makeOptions("GET",true); //True add's the token
 return fetch(`${URL}/event/${eventId}`, options).then(handleHttpErrors);
