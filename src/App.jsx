@@ -70,7 +70,7 @@ function App() {
     <ThemeProvider theme={theme}>
       {!loggedIn ? (
         isRegistering ? (
-          <Register onSwitchToLogin={() => setIsRegistering(false)} />
+          <Register onSwitchToLogin={() => setIsRegistering(false)} setIsRegistering={setIsRegistering} />
         ) : (
           <LogIn login={login} onSwitchToRegister={() => setIsRegistering(true)} setIsRegistering={setIsRegistering} />
         )
