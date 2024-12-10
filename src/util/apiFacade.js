@@ -1,4 +1,4 @@
-const URL = "http://eventapi.lukasronberg.dk";
+const URL = "http://eventapi.lukasronberg.dk/api";
 
 function handleHttpErrors(res) {
 if (!res.ok) {
@@ -87,9 +87,9 @@ return {
     login,
     logout,
     fetchDataForSpecificEvent,
-    fetchDataForTrucks: fetchDataForAllEvents,
+    fetchDataForAllEvents,
     hasUserAccess,
-    getTruckById: getUserById,
+    getUserById,
     getDriverById
 }
 }

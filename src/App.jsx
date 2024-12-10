@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import './App.css'
 import theme from './util/theme'
+import LogIn from './pages/Login';
+import facade from './util/apiFacade';
 
 const Content = styled.div`
   display: flex;
@@ -32,6 +34,7 @@ const ErrorBanner = styled.div`
 function App() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [showRenderError, setShowRenderError] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,14 +45,23 @@ function App() {
     setShowRenderError(false);
   }, [location]);
 
+  const logout = () => {
+    facade.logout();
+    setLoggedIn(false);
+   } 
+   const login = (user, pass) => {
+    facade.login(user,pass).then(() => setLoggedIn(true))
+   } 
+
   return (
     <ThemeProvider theme={theme}>
+     {!loggedIn ? (<LogIn login={login} />) :
       <Content>
         <MainContent>
           {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
           <Outlet />
         </MainContent>
-      </Content>
+      </Content> }
     </ThemeProvider>
   )
 }
