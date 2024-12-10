@@ -31,7 +31,7 @@ const login = (username, password) => {
 }
 
 const register = (username, password, age, phone, email) => {
-  const options = makeOptions("POST", false, { username, password, age, phone, email });
+  const options = makeOptions("POST", false, { username, password, age, phoneNumber: phone, email });
   return fetch(`${URL}/auth/register`, options)
     .then(handleHttpErrors)
     .catch(error => {
