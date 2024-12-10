@@ -49,14 +49,14 @@ const fetchDataForAllEvents = () => {
     const options = makeOptions("GET",true); //True add's the token
 return fetch(URL + "/event", options).then(handleHttpErrors);
 }
-const fetchDataForDrivers = () => { 
-  const options = makeOptions("GET",false); //True add's the token
-return fetch(URL + "/drivers", options).then(handleHttpErrors);
+const fetchDataForSpecificEvent = (eventId) => { 
+  const options = makeOptions("GET",true); //True add's the token
+return fetch(`${URL}/event/${eventId}`, options).then(handleHttpErrors);
 }
 
-const getTruckById = (tripId) => {
+const getUserById = (userId) => {
   const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
-  return fetch(`${URL}/trucks/${tripId}`, options).then(handleHttpErrors);
+  return fetch(`${URL}/user/${userId}`, options).then(handleHttpErrors);
 };
 const getDriverById = (tripId) => {
   const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
@@ -86,10 +86,10 @@ return {
     loggedIn,
     login,
     logout,
-    fetchDataForDrivers,
+    fetchDataForSpecificEvent,
     fetchDataForTrucks: fetchDataForAllEvents,
     hasUserAccess,
-    getTruckById,
+    getTruckById: getUserById,
     getDriverById
 }
 }
