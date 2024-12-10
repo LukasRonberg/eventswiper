@@ -35,6 +35,7 @@ function App() {
   const [showRenderError, setShowRenderError] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [events, setEvents] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ function App() {
   useEffect(() => {
     setErrorMessage(null);
     setShowRenderError(false);
+    
   }, [location]);
 
   const logout = () => {
@@ -53,6 +55,16 @@ function App() {
   const login = (user, pass) => {
     facade.login(user, pass).then(() => setLoggedIn(true));
   };
+
+  
+  useEffect(() => {
+    try{
+      facade.fetchDataForAllEvents().then(data => setEvents(data));
+
+    }catch(error){
+      setErrorMessage("An error occurred while fetching event data." + error);
+    }
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -66,7 +78,7 @@ function App() {
         <Content>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet />
+            <Outlet context={{events}}/>
           </MainContent>
         </Content>
       )}
