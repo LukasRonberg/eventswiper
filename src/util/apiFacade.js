@@ -15,8 +15,20 @@ const getToken = () => {
   return localStorage.getItem('jwtToken')
 }
 const loggedIn = () => {
-  const loggedIn = getToken() != null;
-  return loggedIn;
+  const token = getToken();
+  if (!token) return false;
+
+  try {
+    // JWT has 3 parts, the header, payload and signature. Here we access the payload, which contains the expiration date
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+    return payload.exp > currentTime; // Validate that token is not expired. If exp (expiration date) is higher, the user is still logged in
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return false; // Return false if decoding fails
+  }
+  //const loggedIn = getToken() != null;
+  //return loggedIn;
 }
 const logout = () => {
   localStorage.removeItem("jwtToken");
