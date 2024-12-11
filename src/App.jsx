@@ -66,6 +66,16 @@ function App() {
     setErrorMessage(null);
   }, [location]);
 
+  useEffect(() => {
+    if (facade.loggedIn()) {
+      setLoggedIn(true);
+    } else {
+      facade.logout(); // Clears invalid tokens from localStorage
+      setLoggedIn(false); // Ensure user is logged out in the UI
+    }
+  }, []);
+  
+
   const logout = () => {
     facade.logout();
     setLoggedIn(false);
@@ -87,13 +97,9 @@ function App() {
     <ThemeProvider theme={theme}>
       {!loggedIn ? (
         isRegistering ? (
-          <Register onSwitchToLogin={() => setIsRegistering(false)} />
+          <Register /*onSwitchToLogin={() => setIsRegistering(false)}*/ setIsRegistering={setIsRegistering} />
         ) : (
-          <LogIn
-            login={login}
-            onSwitchToRegister={() => setIsRegistering(true)}
-            setIsRegistering={setIsRegistering}
-          />
+          <LogIn login={login} /*onSwitchToRegister={() => setIsRegistering(true)}*/ setIsRegistering={setIsRegistering} />
         )
       ) : (
         <Content>
