@@ -1,0 +1,128 @@
+/* Global Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  /* Main Title Styling */
+  h1 {
+    text-align: center;
+    color: #010101;
+    font-size: 2.5rem;
+    margin-top: 0px;
+  }
+  
+  /* Event Cards Container */
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    position: relative;
+  }
+  
+  /* Event Card Styling */
+  .event-card {
+    position: absolute;
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+  
+  .event-card img {
+    width: 100%;
+    height: 50%;
+    object-fit: cover;
+  }
+  
+  .event-card h2 {
+    margin: 10px 0;
+    font-size: 2rem;
+  }
+  
+  .event-card p {
+    margin: 5px 10px;
+    color: #555;
+    font-size: 1rem;
+  }
+
+  .event-description {
+    margin: 10px 20px;
+    height: 20%
+  }
+  
+  .return-button {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    font-size: 1.5rem;
+    top: 0px;
+    left: 0px;
+    background-color: #ecedd4;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+    .return-button:hover {
+        background-color: #e5ebe5;
+    }
+
+  /* Button Container */
+  .button-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    height: 75px;
+  }
+  
+  .button-container button {
+    width: 10%;
+    margin: 10px 20px;
+    padding: 10px 30px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10%;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button-container button.like {
+    color:#2c8d30;
+    background-color: #e5ebe5;
+  }
+  
+  .button-container button.like:hover {
+    background-color: #c0c9c0;
+    /*background-color: #45a049;*/
+  }
+  
+  .button-container button.dislike {
+    color:#c0291e;
+    background-color: #e5ebe5;
+  }
+  
+  .button-container button.dislike:hover {
+    background-color: #c0c9c0;
+    /*background-color: #e53935;*/
+  }
+  
+  /* No More Events Message */
+  .no-events {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+  }
+  

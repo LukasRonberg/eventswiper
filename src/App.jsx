@@ -9,17 +9,40 @@ import facade from "./util/apiFacade";
 
 const Content = styled.div`
   display: flex;
-  margin-top: 20px;
-  height: calc(100vh - 160px); /* Adjust for header and footer height */
+  flex-direction: column; /* To include the navbar at the top */
+  height: 100vh;
   color: #333;
+`;
+
+const Navbar = styled.nav`
+  background-color: lightseagreen;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const NavItem = styled.button`
+  width: 200px;
+  background: none;
+  color: white;
+  font-size: 1.2rem;
+  margin: 0 40px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  border: none;
+
+  &:hover {
+    color: #c8e6c9;
+  }
 `;
 
 const MainContent = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 5px;
   background-color: #fafafa;
   border-left: 2px solid #ccc;
-  /* Allows scrolling inside the main content if needed */
+  overflow-y: auto; /* Allows scrolling inside the main content */
 `;
 
 const ErrorBanner = styled.div`
@@ -32,7 +55,6 @@ const ErrorBanner = styled.div`
 
 function App() {
   const [errorMessage, setErrorMessage] = useState(null);
-  const [showRenderError, setShowRenderError] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
@@ -40,11 +62,8 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Reset error message on route change
   useEffect(() => {
     setErrorMessage(null);
-    setShowRenderError(false);
-    
   }, [location]);
 
   const logout = () => {
@@ -56,12 +75,10 @@ function App() {
     facade.login(user, pass).then(() => setLoggedIn(true));
   };
 
-  
   useEffect(() => {
-    try{
-      facade.fetchDataForAllEvents().then(data => setEvents(data));
-
-    }catch(error){
+    try {
+      facade.fetchDataForAllEvents().then((data) => setEvents(data));
+    } catch (error) {
       setErrorMessage("An error occurred while fetching event data." + error);
     }
   }, []);
@@ -72,13 +89,25 @@ function App() {
         isRegistering ? (
           <Register onSwitchToLogin={() => setIsRegistering(false)} />
         ) : (
-          <LogIn login={login} onSwitchToRegister={() => setIsRegistering(true)} setIsRegistering={setIsRegistering} />
+          <LogIn
+            login={login}
+            onSwitchToRegister={() => setIsRegistering(true)}
+            setIsRegistering={setIsRegistering}
+          />
         )
       ) : (
         <Content>
+          <Navbar>
+            <div>
+              <NavItem onClick={() => navigate("/")}>Home</NavItem>
+              <NavItem onClick={() => navigate("/events")}>Matches</NavItem>
+              <NavItem onClick={() => navigate("/profile")}>Profile</NavItem>
+            </div>
+            <NavItem onClick={logout}>Logout</NavItem>
+          </Navbar>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events}}/>
+            <Outlet context={{ events }} />
           </MainContent>
         </Content>
       )}
