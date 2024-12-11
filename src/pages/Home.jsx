@@ -57,7 +57,9 @@ function Home() {
             <h2>{currentEvent.eventName}</h2>
             <img src={`src/assets/${currentEvent.eventName}.jpg`}
                 alt={currentEvent.eventName}
-                onError={(e) => e.target.src = 'src/assets/Party.jpg'}  // Fallback image
+                onError={(e) => {e.target.src = 'src/assets/Party.jpg';
+                    console.log("Image: "+ currentEvent.eventName + " not found");}
+                }  // Fallback image
             />
 
             <p className="event-description"> {currentEvent.description}</p>
