@@ -1,36 +1,68 @@
 import { useOutletContext } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Home.css'; // Import CSS for styling
 import facade from "/src/util/apiFacade.js";
 
-
 function Home() {
-  const { events } = useOutletContext();
+  const { events: initialEvents } = useOutletContext();
+  const [events, setEvents] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [allEvents, setAllEvents] = useState([]);
+
+  useEffect(() => {
+    // Decode username from JWT token
+    const userName = JSON.parse(atob(localStorage.getItem("jwtToken").split('.')[1])).username;
+
+    // Fetch user data and combine event arrays
+    facade.getUserById(userName).then((data) => {
+      const userSwipedEvents = String(data.swipedEventsIds || "").split(",").map(Number);
+      const userUnSwipedEvents = String(data.unswipedEventsIds || "").split(",").map(Number);
+
+      // Combine the arrays and set to state
+      setAllEvents([...userSwipedEvents, ...userUnSwipedEvents]);
+    });
+  }, []); // Runs once on component mount
+
+  useEffect(() => {
+    if (allEvents.length > 0) {
+      // Remove swiped/unswiped events from the events array
+      const filteredEvents = initialEvents.filter(event => !allEvents.includes(event.id));
+      setEvents(filteredEvents);
+
+      // Reset the current index if necessary
+      if (currentIndex >= filteredEvents.length) {
+        setCurrentIndex(0);
+      }
+    } else {
+      // Initialize events if allEvents is not yet loaded
+      setEvents(initialEvents);
+    }
+  }, [allEvents, initialEvents, currentIndex]);
 
   const handleLike = () => {
     console.log("Liked:", events[currentIndex]);
-    //TODO: det skal ikke være hardcoded at det er Bob der swiper men skal være den bruger der er logget ind
-    addEventToUser("Bob", "true");
+    addEventToUser("true");
     nextEvent();
   };
-
-  const addEventToUser = (user, swipedOrNo) => {
-    facade.addEventToUser(user, events[currentIndex].id, swipedOrNo).then(() => console.log("Event added to user: " + user + ":", events[currentIndex] + ", swiped: " + swipedOrNo));
-  };
-
-
-
 
   const handleDislike = () => {
     console.log("Disliked:", events[currentIndex]);
-    addEventToUser("Bob", "false");
+    addEventToUser("false");
     nextEvent();
   };
 
+  const addEventToUser = (swipedOrNo) => {
+    const userName = JSON.parse(atob(localStorage.getItem("jwtToken").split('.')[1])).username;
+    facade
+      .addEventToUser(userName, events[currentIndex].id, swipedOrNo)
+      .then(() =>
+        console.log(`Event added to user: ${userName}, Event ID: ${events[currentIndex].id}, Swiped: ${swipedOrNo}`)
+      );
+  };
+
   const nextEvent = () => {
-    if (currentIndex <= events.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (currentIndex < events.length - 1) {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
       console.log("No more events available");
     }
@@ -38,9 +70,9 @@ function Home() {
 
   const previousEvent = () => {
     if (currentIndex > 0) {
-        setCurrentIndex(currentIndex - 1);
+      setCurrentIndex((prevIndex) => prevIndex - 1);
     }
-    }
+  };
 
   if (!events || events.length === 0) {
     return <p className="no-events">No events available</p>;
@@ -52,19 +84,20 @@ function Home() {
     <div>
       <div className="card-container">
         {currentIndex < events.length ? (
-            <div className="event-card" key={currentEvent.id}>
-              <button className="return-button" onClick={previousEvent}> ← </button>
+          <div className="event-card" key={currentEvent.id}>
+            <button className="return-button" onClick={previousEvent}>
+              ←
+            </button>
             <h2>{currentEvent.eventName}</h2>
-            <img src={`/assets/${currentEvent.eventName}.jpg`}
-                alt={currentEvent.eventName}
-                onError={(e) => {
-                    console.log("Image: "+ currentEvent.eventName + " not found");
-                    e.target.src = 'src/assets/Party.jpg';
-                    }
-                }  // Fallback image
+            <img
+              src={`/assets/${currentEvent.eventName}.jpg`}
+              alt={currentEvent.eventName}
+              onError={(e) => {
+                console.log(`Image: ${currentEvent.eventName} not found`);
+                e.target.src = 'src/assets/Party.jpg'; // Fallback image
+              }}
             />
-
-            <p className="event-description"> {currentEvent.description}</p>
+            <p className="event-description">{currentEvent.description}</p>
             <br />
             <p>Price: ~{currentEvent.estimatedPrice} Kr.</p>
             <p>Tags: {currentEvent.eventType}</p>
@@ -77,8 +110,12 @@ function Home() {
 
       {currentIndex < events.length && (
         <div className="button-container">
-          <button className="dislike" onClick={handleDislike}> Dislike </button>
-          <button className="like" onClick={handleLike}> Like </button>
+          <button className="dislike" onClick={handleDislike}>
+            Dislike
+          </button>
+          <button className="like" onClick={handleLike}>
+            Like
+          </button>
         </div>
       )}
     </div>

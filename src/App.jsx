@@ -27,7 +27,7 @@ const NavItem = styled.button`
   background: none;
   color: white;
   font-size: 1.2rem;
-  margin: 0 40px;
+  margin: 0 0px;
   cursor: pointer;
   transition: color 0.3s ease;
   border: none;

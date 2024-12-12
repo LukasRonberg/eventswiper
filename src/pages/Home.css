@@ -87,7 +87,7 @@ body {
   }
   
   .button-container button {
-    width: 10%;
+    /*width: 10%;*/
     margin: 10px 20px;
     padding: 10px 30px;
     font-size: 1.3rem;

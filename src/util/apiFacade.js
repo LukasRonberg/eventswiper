@@ -1,4 +1,5 @@
-const URL = "https://eventapi.lukasronberg.dk/api";
+//const URL = "https://eventapi.lukasronberg.dk/api";
+const URL = "http://localhost:7070/api";
 
 function handleHttpErrors(res) {
 if (!res.ok) {
