@@ -88,6 +88,17 @@ const addEventToUser = (userId, eventid, swipedOrNo) => {
   return fetch(URL + `/user/${userId}/event/${eventid}/${swipedOrNo}`, options).then(handleHttpErrors);
 };
 
+const addEventGroupToUser = (userId, eventid) => {
+  const options = makeOptions("PUT", true, { userId, eventid });
+  return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
+};
+
+const removeEventGroupFromUser = (userId, eventid) => {
+  const options = makeOptions("DELETE", true);
+  return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
+}
+
+
 const updateUser = (userData) => {
   const options = makeOptions("PUT", true, userData); // `true` ensures token inclusion
   return fetch(`${URL}/user/${userData.username}`, options)
@@ -135,7 +146,9 @@ return {
     getDriverById,
     register,
     addEventToUser,
-    updateUser
+    updateUser,
+    addEventGroupToUser,
+    removeEventGroupFromUser
 }
 }
 const facade = apiFacade();

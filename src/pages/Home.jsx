@@ -1,7 +1,8 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components'; // Import styled-components
+import {styled, ThemeProvider } from "styled-components";
 import facade from "/src/util/apiFacade.js";
+import theme from "/src/util/theme";
 
 // Styled Components
 
@@ -9,7 +10,7 @@ const Container = styled.div`
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: ${(props) => props.theme.colors.background};
   color: #333;
 `;
 
@@ -21,6 +22,7 @@ const Title = styled.h1`
 `;
 
 const CardContainer = styled.div`
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +34,7 @@ const EventCard = styled.div`
   position: absolute;
   width: 100%;
   max-width: 500px;
-  height: 100%;
+  height: 90%;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
@@ -76,17 +78,18 @@ const ReturnButton = styled.button`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: 10px;
+  margin-top: 0px;
   display: flex;
   justify-content: center;
   height: 75px;
 `;
 
 const Button = styled.button`
-  margin: 10px 20px;
-  padding: 10px 30px;
-  font-size: 1.3rem;
-  font-weight: bold;
+  width: 200px;
+  margin: 0px 20px;
+  padding: 0px 0px;
+  font-size: 3rem;
+  //font-weight: bold;
   border: none;
   border-radius: 10%;
   color: #ffffff;
@@ -94,21 +97,21 @@ const Button = styled.button`
   transition: background-color 0.3s ease;
 
   &.like {
-    color: #2c8d30;
-    background-color: #e5ebe5;
+    color:rgb(255, 255, 255);
+    background-color: ${(props) => props.theme.colors.like};
   }
 
   &.like:hover {
-    background-color: #c0c9c0;
+    background-color: ${(props) => props.theme.colors.likeHover};
   }
 
   &.dislike {
-    color: #c0291e;
-    background-color: #e5ebe5;
+    color:rgb(255, 255, 255);
+    background-color: ${(props) => props.theme.colors.dislike};
   }
 
   &.dislike:hover {
-    background-color: #c0c9c0;
+    background-color: ${(props) => props.theme.colors.dislikeHover};
   }
 `;
 
@@ -196,6 +199,7 @@ function Home() {
   const currentEvent = events[currentIndex];
 
   return (
+    <ThemeProvider theme={theme}>
     <Container>
       <CardContainer>
         {currentIndex < events.length ? (
@@ -222,11 +226,12 @@ function Home() {
 
       {currentIndex < events.length && (
         <ButtonContainer>
-          <Button className="dislike" onClick={handleDislike}>Dislike</Button>
-          <Button className="like" onClick={handleLike}>Like</Button>
+          <Button className="dislike" onClick={handleDislike}>👎</Button>
+          <Button className="like" onClick={handleLike}>❤️</Button>
         </ButtonContainer>
       )}
     </Container>
+    </ThemeProvider>
   );
 }
 

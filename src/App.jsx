@@ -17,13 +17,14 @@ const Content = styled.div`
 const Navbar = styled.nav`
   background-color: lightseagreen;
   color: white;
+  margin: 0px 0px 0px 0px;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
 `;
 
 const NavItem = styled.button`
-  width: 200px;
+  width: 150px;
   background: none;
   color: white;
   font-size: 1.2rem;
@@ -38,6 +39,7 @@ const NavItem = styled.button`
 `;
 
 const MainContent = styled.div`
+
   flex: 1;
   padding: 5px;
   background-color: #fafafa;
