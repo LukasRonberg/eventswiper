@@ -75,18 +75,22 @@ function App() {
   
       const fetchUser = async () => {
         try {
-          const userDetails = await facade.getUserById(username);
-          setUser(userDetails);
+          const userDetails = await facade.getUserById(username).then((data) => {
+            console.log(data)
+            setUser(data)
+          });
+         
         } catch (error) {
           console.error('Error fetching user details:', error);
         }
       };
   
-      fetchUser();
+      fetchUser(); // Now this function is async and awaited
     } else {
       logout();
     }
-  }, [facade.loggedIn]);
+  }, []);
+  
 
   const getUsernameFromToken = (token) => {
     try {
@@ -115,6 +119,8 @@ function App() {
       setErrorMessage("An error occurred while fetching event data." + error);
     }
   }, []);
+
+  
 
   return (
     <ThemeProvider theme={theme}>

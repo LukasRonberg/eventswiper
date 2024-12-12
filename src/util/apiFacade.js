@@ -1,5 +1,5 @@
-//const URL = "https://eventapi.lukasronberg.dk/api";
-const URL = "http://localhost:7070/api";
+const URL = "https://eventapi.lukasronberg.dk/api";
+//const URL = "http://localhost:7070/api";
 
 function handleHttpErrors(res) {
 if (!res.ok) {
@@ -88,6 +88,15 @@ const addEventToUser = (userId, eventid, swipedOrNo) => {
   return fetch(URL + `/user/${userId}/event/${eventid}/${swipedOrNo}`, options).then(handleHttpErrors);
 };
 
+const updateUser = (userData) => {
+  const options = makeOptions("PUT", true, userData); // `true` ensures token inclusion
+  return fetch(`${URL}/user/${userData.username}`, options)
+    .then(handleHttpErrors)
+    .catch((error) => {
+      console.error("Failed to update user:", error);
+      throw error;
+    });
+};
 
 
 const getDriverById = (tripId) => {
@@ -125,7 +134,8 @@ return {
     getUserById,
     getDriverById,
     register,
-    addEventToUser
+    addEventToUser,
+    updateUser
 }
 }
 const facade = apiFacade();
