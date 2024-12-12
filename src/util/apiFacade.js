@@ -82,6 +82,13 @@ const getUserById = (username) => {
   return fetch(`${URL}/user/${username}`, options).then(handleHttpErrors);
 };
 
+const addEventToUser = (userId, eventid, swipedOrNo) => {
+  const options = makeOptions("PUT", true, { userId, eventid, swipedOrNo });
+  return fetch(URL + `/user/${userId}/event/${eventid}/${swipedOrNo}`, options).then(handleHttpErrors);
+};
+
+
+
 const getDriverById = (tripId) => {
   const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
   return fetch(`${URL}/drivers/${tripId}`, options).then(handleHttpErrors);
@@ -116,7 +123,8 @@ return {
     hasUserAccess,
     getUserById,
     getDriverById,
-    register
+    register,
+    addEventToUser
 }
 }
 const facade = apiFacade();

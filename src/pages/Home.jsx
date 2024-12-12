@@ -1,10 +1,8 @@
 import { useOutletContext } from 'react-router-dom';
-import { styled } from 'styled-components';
 import { useState } from 'react';
+import './Home.css'; // Import CSS for styling
+import facade from "/src/util/apiFacade.js";
 
-const MainTitle = styled.h1`
-  text-align: center;
-`;
 
 function Home() {
   const { events } = useOutletContext();
@@ -12,11 +10,21 @@ function Home() {
 
   const handleLike = () => {
     console.log("Liked:", events[currentIndex]);
+    //TODO: det skal ikke være hardcoded at det er Bob der swiper men skal være den bruger der er logget ind
+    addEventToUser("Bob", "true");
     nextEvent();
   };
 
+  const addEventToUser = (user, swipedOrNo) => {
+    facade.addEventToUser(user, events[currentIndex].id, swipedOrNo).then(() => console.log("Event added to user: " + user + ":", events[currentIndex] + ", swiped: " + swipedOrNo));
+  };
+
+
+
+
   const handleDislike = () => {
     console.log("Disliked:", events[currentIndex]);
+    addEventToUser("Bob", "false");
     nextEvent();
   };
 
@@ -28,34 +36,53 @@ function Home() {
     }
   };
 
+  const previousEvent = () => {
+    if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+    }
+    }
+
   if (!events || events.length === 0) {
-    return <p>No events available</p>;
+    return <p className="no-events">No events available</p>;
   }
 
   const currentEvent = events[currentIndex];
 
   return (
     <div>
-      <MainTitle>Welcome to the Event App</MainTitle>
-      <p>Discover, connect, and plan events with ease!</p>
-  
-      {currentIndex < events.length ? (
-        <div key={currentEvent.id}>
-          <h2>{currentEvent.eventName}</h2>
-          <p>{currentEvent.description}</p>
-          <p>Estimated Price: {currentEvent.estimatedPrice} Kr.</p>
-          <p>Dress Code: {currentEvent.dressCode}</p>
-          <p>Tags: {currentEvent.eventType}</p>
-          <br />
-          <button onClick={handleLike}>Like</button>
-          <button onClick={handleDislike}>Dislike</button>
+      <div className="card-container">
+        {currentIndex < events.length ? (
+            <div className="event-card" key={currentEvent.id}>
+              <button className="return-button" onClick={previousEvent}> ← </button>
+            <h2>{currentEvent.eventName}</h2>
+            <img src={`/assets/${currentEvent.eventName}.jpg`}
+                alt={currentEvent.eventName}
+                onError={(e) => {
+                    console.log("Image: "+ currentEvent.eventName + " not found");
+                    e.target.src = 'src/assets/Party.jpg';
+                    }
+                }  // Fallback image
+            />
+
+            <p className="event-description"> {currentEvent.description}</p>
+            <br />
+            <p>Price: ~{currentEvent.estimatedPrice} Kr.</p>
+            <p>Tags: {currentEvent.eventType}</p>
+            <p>Dress Code: {currentEvent.dressCode}</p>
+          </div>
+        ) : (
+          <p className="no-events">No more events available</p>
+        )}
+      </div>
+
+      {currentIndex < events.length && (
+        <div className="button-container">
+          <button className="dislike" onClick={handleDislike}> Dislike </button>
+          <button className="like" onClick={handleLike}> Like </button>
         </div>
-      ) : (
-        <p>No more events available</p>
       )}
     </div>
   );
-  
 }
 
 export default Home;
