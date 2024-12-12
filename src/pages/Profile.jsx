@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import styled from "styled-components";
 import facade from "../util/apiFacade";
@@ -35,6 +35,10 @@ const Profile = () => {
   const { user } = useOutletContext(); // Get user from parent route context
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(user);
+
+  useEffect(() => {
+    setFormData(user);
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({
@@ -113,7 +117,7 @@ const Profile = () => {
         ) : (
           <>
             <ProfileInfo>
-              <strong>Username:</strong> {formData.username}
+              <strong>Username:</strong> {user.username}
             </ProfileInfo>
             <ProfileInfo>
               <strong>Age:</strong> {formData.age}

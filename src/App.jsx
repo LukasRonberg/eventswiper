@@ -59,7 +59,6 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
   const [user,setUser] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -69,26 +68,29 @@ function App() {
   }, [location]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (facade.loggedIn()) {
-        setLoggedIn(true);
-        const token = facade.getToken();
-        const username = getUsernameFromToken(token);
-
+    if (facade.loggedIn()) {
+      setLoggedIn(true);
+      const token = facade.getToken();
+      const username = getUsernameFromToken(token);
+  
+      const fetchUser = async () => {
         try {
-          const userDetails = await facade.getUserById(username);
-          setUser(userDetails);
+          const userDetails = await facade.getUserById(username).then((data) => {
+            console.log(data)
+            setUser(data)
+          });
+         
         } catch (error) {
-          console.error("Error fetching user details:", error);
+          console.error('Error fetching user details:', error);
         }
-      } else {
-        logout();
-      }
-      setIsLoading(false); // Stop loading after fetch
-    };
-
-    fetchUser();
+      };
+  
+      fetchUser(); // Now this function is async and awaited
+    } else {
+      logout();
+    }
   }, []);
+  
 
   const getUsernameFromToken = (token) => {
     try {
@@ -106,20 +108,8 @@ function App() {
     setUser({});
   };
 
-  const login = async (user, pass) => {
-    try {
-      await facade.login(user, pass);
-      setLoggedIn(true);
-      setIsLoading(true); // Reset loading state to fetch user data again
-      const token = facade.getToken();
-      const username = getUsernameFromToken(token);
-
-      const userDetails = await facade.getUserById(username);
-      setUser(userDetails);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+  const login = (user, pass) => {
+    facade.login(user, pass).then(() => setLoggedIn(true));
   };
 
   useEffect(() => {
@@ -130,9 +120,7 @@ function App() {
     }
   }, []);
 
-  if (isLoading) {
-    return <div>Loading...</div>; // Show a loading spinner or message
-  }
+  
 
   return (
     <ThemeProvider theme={theme}>
