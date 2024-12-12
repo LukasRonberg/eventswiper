@@ -76,7 +76,7 @@ const WarningMessage = styled.span`
   margin-top: -10px;
 `;
 
-function Register({ onSwitchToLogin, setIsRegistering }) {
+function Register({ setIsRegistering }) {
   const init = { username: "", confirmPassword: "", age: "", phone: "", email: "", password: "" };
   const [loginCredentials, setLoginCredentials] = useState(init);
   const [error, setError] = useState("");
@@ -103,6 +103,10 @@ function Register({ onSwitchToLogin, setIsRegistering }) {
       setError(errorMessage);
     }
   };
+
+  const onSwitchToLogin = () => {
+    setIsRegistering(false);
+  }
 
   const onChange = (evt) => {
     setLoginCredentials({

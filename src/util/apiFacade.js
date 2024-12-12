@@ -52,9 +52,6 @@ const register = (username, password, age, phone, email) => {
     });
 };
 
-
-
-
 const getUserRoles = () => {
     const token = getToken()
     if (token != null) {
@@ -80,14 +77,16 @@ const fetchDataForSpecificEvent = (eventId) => {
 return fetch(`${URL}/event/${eventId}`, options).then(handleHttpErrors);
 }
 
-const getUserById = (userId) => {
-  const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
-  return fetch(`${URL}/user/${userId}`, options).then(handleHttpErrors);
+const getUserById = (username) => {
+  const options = makeOptions("GET", true); // `true` ensures the token is added to the headers
+  return fetch(`${URL}/user/${username}`, options).then(handleHttpErrors);
 };
+
 const getDriverById = (tripId) => {
   const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
   return fetch(`${URL}/drivers/${tripId}`, options).then(handleHttpErrors);
 };
+
 
 const makeOptions= (method,addToken,body) =>{
   var opts = {

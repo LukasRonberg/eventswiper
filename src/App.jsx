@@ -36,6 +36,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
+  const [user,setUser] = useState({});
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -50,16 +51,38 @@ function App() {
   useEffect(() => {
     if (facade.loggedIn()) {
       setLoggedIn(true);
-    } else {
-      facade.logout(); // Clears invalid tokens from localStorage
-      setLoggedIn(false); // Ensure user is logged out in the UI
-    }
-  }, []);
+      const token = facade.getToken();
+      const username = getUsernameFromToken(token);
   
+      const fetchUser = async () => {
+        try {
+          const userDetails = await facade.getUserById(username);
+          setUser(userDetails);
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+        }
+      };
+  
+      fetchUser();
+    } else {
+      logout();
+    }
+  }, [facade.loggedIn]);
 
+  const getUsernameFromToken = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.username;
+    } catch (error) {
+      console.error("Failed to decode the token or extract username:", error);
+      return null;
+    }
+  };
+  
   const logout = () => {
     facade.logout();
     setLoggedIn(false);
+    setUser({});
   };
 
   const login = (user, pass) => {
@@ -80,15 +103,15 @@ function App() {
     <ThemeProvider theme={theme}>
       {!loggedIn ? (
         isRegistering ? (
-          <Register /*onSwitchToLogin={() => setIsRegistering(false)}*/ setIsRegistering={setIsRegistering} />
+          <Register setIsRegistering={setIsRegistering} />
         ) : (
-          <LogIn login={login} /*onSwitchToRegister={() => setIsRegistering(true)}*/ setIsRegistering={setIsRegistering} />
+          <LogIn login={login} setIsRegistering={setIsRegistering} />
         )
       ) : (
         <Content>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events}}/>
+            <Outlet context={{events, user}}/>
           </MainContent>
         </Content>
       )}

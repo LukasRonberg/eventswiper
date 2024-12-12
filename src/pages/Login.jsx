@@ -65,15 +65,38 @@ const SwitchButton = styled.button`
   text-decoration: underline;
 `;
 
-function LogIn({ login, onSwitchToRegister, setIsRegistering }) {
+const ErrorMessage = styled.p`
+  color: red;
+  margin: 0;
+  font-size: 14px;
+`;
+
+function LogIn({ login, setIsRegistering }) {
   const init = { username: "", password: "" };
   const [loginCredentials, setLoginCredentials] = useState(init);
+  const [error, setError] = useState("");
+
 
   const performLogin = (evt) => {
     evt.preventDefault();
-    login(loginCredentials.username, loginCredentials.password);
+
+    const isValid = login(loginCredentials.username, loginCredentials.password);
+    
+    if (!isValid) {
+      setError("Invalid username or password. Please try again.");
+      return;
+    }
+
+    // Clear error and proceed
+    setError("");
     setIsRegistering(false);
+    //login(loginCredentials.username, loginCredentials.password);
+    //setIsRegistering(false);
   };
+
+  const onSwitchToRegister = () =>{
+    setIsRegistering(true);
+  }
 
   const onChange = (evt) => {
     setLoginCredentials({
@@ -100,6 +123,7 @@ function LogIn({ login, onSwitchToRegister, setIsRegistering }) {
             onChange={onChange}
             value={loginCredentials.password}
           />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <Button type="submit">Login</Button>
         </StyledForm>
         <SwitchButton onClick={onSwitchToRegister}>
