@@ -59,6 +59,7 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
   const [user,setUser] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -68,25 +69,26 @@ function App() {
   }, [location]);
 
   useEffect(() => {
-    if (facade.loggedIn()) {
-      setLoggedIn(true);
-      const token = facade.getToken();
-      const username = getUsernameFromToken(token);
-  
-      const fetchUser = async () => {
+    const fetchUser = async () => {
+      if (facade.loggedIn()) {
+        setLoggedIn(true);
+        const token = facade.getToken();
+        const username = getUsernameFromToken(token);
+
         try {
           const userDetails = await facade.getUserById(username);
           setUser(userDetails);
         } catch (error) {
-          console.error('Error fetching user details:', error);
+          console.error("Error fetching user details:", error);
         }
-      };
-  
-      fetchUser();
-    } else {
-      logout();
-    }
-  }, [facade.loggedIn]);
+      } else {
+        logout();
+      }
+      setIsLoading(false); // Stop loading after fetch
+    };
+
+    fetchUser();
+  }, []);
 
   const getUsernameFromToken = (token) => {
     try {
@@ -104,8 +106,20 @@ function App() {
     setUser({});
   };
 
-  const login = (user, pass) => {
-    facade.login(user, pass).then(() => setLoggedIn(true));
+  const login = async (user, pass) => {
+    try {
+      await facade.login(user, pass);
+      setLoggedIn(true);
+      setIsLoading(true); // Reset loading state to fetch user data again
+      const token = facade.getToken();
+      const username = getUsernameFromToken(token);
+
+      const userDetails = await facade.getUserById(username);
+      setUser(userDetails);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   useEffect(() => {
@@ -115,6 +129,10 @@ function App() {
       setErrorMessage("An error occurred while fetching event data." + error);
     }
   }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show a loading spinner or message
+  }
 
   return (
     <ThemeProvider theme={theme}>
