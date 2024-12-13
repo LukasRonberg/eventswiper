@@ -77,15 +77,14 @@ function App() {
   
       const fetchUser = async () => {
         try {
-          const userDetails = await facade.getUserById(username).then((data) => {
-            console.log(data)
-            setUser(data)
-          });
-         
+          const userDetails = await facade.getUserById(username);
+          console.log('Fetched user details:', userDetails);  // Debugging here
+          setUser(userDetails);
         } catch (error) {
           console.error('Error fetching user details:', error);
         }
       };
+      
   
       fetchUser(); // Now this function is async and awaited
     } else {

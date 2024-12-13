@@ -65,11 +65,11 @@ const Profile = () => {
       });
   };
 
-  if (!user) {
+  if (!user || Object.keys(user).length === 0) {
     return (
       <ProfileContainer>
         <ProfileContent>
-          <h3>No user data found.</h3>
+          <h3>Loading...</h3>
         </ProfileContent>
       </ProfileContainer>
     );
