@@ -88,9 +88,9 @@ function App() {
   
       fetchUser(); // Now this function is async and awaited
     } else {
-      logout();
+      console.log("Logged in is false")
     }
-  }, []);
+  }, [loggedIn]);
   
 
   const getUsernameFromToken = (token) => {

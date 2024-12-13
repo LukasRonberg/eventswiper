@@ -36,12 +36,21 @@ const logout = () => {
 }
 
 const login = (username, password) => { 
-    console.log(username,password)
-    const options = makeOptions("POST", false, {username, password });
-    return fetch(`${URL}/auth/login`, options)
-        .then(handleHttpErrors)
-        .then(res => {setToken(res.token) })   
-}
+  console.log(username, password);
+
+  const options = makeOptions("POST", false, { username, password });
+  return fetch(`${URL}/auth/login`, options)
+      .then(handleHttpErrors)
+      .then(res => {
+          setToken(res.token);
+          if (loggedIn()) {     // Check if logged in after setting the token
+              console.log("Login successful, token is valid.");
+          } else {
+              console.log("Login failed or token is invalid.");
+          }
+      });
+};
+
 
 const register = (username, password, age, phone, email) => {
   const options = makeOptions("POST", false, { username, password, age, phoneNumber: phone, email });
