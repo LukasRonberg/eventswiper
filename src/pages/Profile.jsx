@@ -32,7 +32,7 @@ const ProfileInfo = styled.div`
 `;
 
 const Profile = () => {
-  const { user } = useOutletContext(); // Get user from parent route context
+  const { user, logout } = useOutletContext(); // Get user from parent route context
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(user);
 
@@ -129,6 +129,8 @@ const Profile = () => {
               <strong>Email:</strong> {formData.email}
             </ProfileInfo>
             <button onClick={() => setIsEditing(true)}>Edit</button>
+            <button onClick={logout}>Logout</button>
+
           </>
         )}
       </ProfileContent>

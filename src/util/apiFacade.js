@@ -119,9 +119,19 @@ const updateUser = (userData) => {
 };
 
 
-const getDriverById = (tripId) => {
-  const options = makeOptions("GET", false); // `true` ensures the token is added to the headers
-  return fetch(`${URL}/drivers/${tripId}`, options).then(handleHttpErrors);
+const fetchDataForSpecificEventGroup = (eventGroupId) => {
+  const options = makeOptions("GET", true);
+  return fetch(`${URL}/eventgroup/${eventGroupId}`, options).then(handleHttpErrors);
+};
+
+const fetchMessagesForEventGroup = (eventGroupId) => {
+  const options = makeOptions("GET", true);
+  return fetch(`${URL}/eventgroup/${eventGroupId}/message`, options).then(handleHttpErrors);
+};
+
+const createMessage = (messageDTO) => {
+  const options = makeOptions("POST", true, messageDTO);
+  return fetch(`${URL}/eventgroup/${messageDTO.eventGroupId}/message`, options).then(handleHttpErrors);
 };
 
 
@@ -152,12 +162,14 @@ return {
     fetchDataForAllEvents,
     hasUserAccess,
     getUserById,
-    getDriverById,
+    fetchDataForSpecificEventGroup,
+    fetchMessagesForEventGroup,
     register,
     addEventToUser,
     updateUser,
     addEventGroupToUser,
-    removeEventGroupFromUser
+    removeEventGroupFromUser,
+    createMessage
 }
 }
 const facade = apiFacade();

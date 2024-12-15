@@ -61,6 +61,7 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
   const [user,setUser] = useState({});
+  const [selectedEventGroupId, setSelectedEventGroupId] = useState(1)
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ function App() {
     facade.logout();
     setLoggedIn(false);
     setUser({});
+    navigate("/login")
   };
 
   const login = (user, pass) => {
@@ -139,11 +141,11 @@ function App() {
               <NavItem onClick={() => navigate("/events")}>Matches</NavItem>
               <NavItem onClick={() => navigate("/profile")}>Profile</NavItem>
             </div>
-            <NavItem onClick={logout}>Logout</NavItem>
+            {/*<NavItem onClick={logout}>Logout</NavItem>*/}
           </Navbar>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events, user}}/>
+            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout}}/>
           </MainContent>
         </Content>
       )}
