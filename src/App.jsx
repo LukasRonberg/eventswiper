@@ -10,7 +10,7 @@ import facade from "./util/apiFacade";
 const Content = styled.div`
   display: flex;
   flex-direction: column; /* To include the navbar at the top */
-  height: 100vh;
+  //height: 100vh;
   color: #333;
 `;
 
@@ -27,7 +27,7 @@ const NavItem = styled.button`
   width: 150px;
   background: none;
   color: white;
-  font-size: 1.2rem;
+  font-size: 2rem;
   margin: 0 0px;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -61,7 +61,8 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
   const [user,setUser] = useState({});
-  const [selectedEventGroupId, setSelectedEventGroupId] = useState(1)
+  const [selectedEventGroupId, setSelectedEventGroupId] = useState()
+  const [creatingEvent, setCreatingEvent] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -112,7 +113,12 @@ function App() {
   };
 
   const login = (user, pass) => {
-    facade.login(user, pass).then(() => setLoggedIn(true));
+    facade.login(user, pass).then(() => {
+      setLoggedIn(true)
+      navigate("/")
+  });
+
+    
   };
 
   useEffect(() => {
@@ -131,7 +137,7 @@ function App() {
         isRegistering ? (
           <Register setIsRegistering={setIsRegistering} />
         ) : (
-          <LogIn login={login} setIsRegistering={setIsRegistering} />
+          <LogIn login={login} setIsRegistering={setIsRegistering}/>
         )
       ) : (
         <Content>
@@ -145,7 +151,7 @@ function App() {
           </Navbar>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout}}/>
+            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent}}/>
           </MainContent>
         </Content>
       )}

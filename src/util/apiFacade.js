@@ -1,5 +1,5 @@
-const URL = "https://eventapi.lukasronberg.dk/api";
-//const URL = "http://localhost:7070/api";
+//const URL = "https://eventapi.lukasronberg.dk/api";
+const URL = "http://localhost:7070/api";
 
 function handleHttpErrors(res) {
 if (!res.ok) {
@@ -97,15 +97,26 @@ const addEventToUser = (userId, eventid, swipedOrNo) => {
   return fetch(URL + `/user/${userId}/event/${eventid}/${swipedOrNo}`, options).then(handleHttpErrors);
 };
 
-const addEventGroupToUser = (userId, eventid) => {
-  const options = makeOptions("PUT", true, { userId, eventid });
-  return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
+const addEventGroupToUser = (userId, eventgroupid) => {
+  const options = makeOptions("PUT", true, { userId, eventid: eventgroupid });
+  return fetch(URL + `/user/${userId}/event/${eventgroupid}`, options).then(handleHttpErrors);
 };
+
+const getAllEventGroups = () => {
+  const options = makeOptions("GET", true);
+  return fetch(URL + "/eventgroup", options).then(handleHttpErrors);
+}
 
 const removeEventGroupFromUser = (userId, eventid) => {
   const options = makeOptions("DELETE", true);
   return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
 }
+
+const createEventGroup = () => {
+  const options = makeOptions("POST", true);
+  return fetch(URL + "/eventgroup/", options).then(handleHttpErrors);
+}
+
 
 
 const updateUser = (userData) => {
@@ -169,7 +180,9 @@ return {
     updateUser,
     addEventGroupToUser,
     removeEventGroupFromUser,
-    createMessage
+    createMessage,
+    createEventGroup,
+    getAllEventGroups
 }
 }
 const facade = apiFacade();
