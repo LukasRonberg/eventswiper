@@ -1,16 +1,15 @@
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { styled, ThemeProvider } from "styled-components";
 import facade from "/src/util/apiFacade.js";
 import theme from "/src/util/theme";
-
 // Styled Components
 
 const Container = styled.div`
   font-family: "Arial", sans-serif;
   background-color: ${(props) => props.theme.colors.background};
   padding: 20px;
-  min-height: 100vh;
+  min-height: 90vh;
 `;
 
 const ButtonContainer = styled.div`
@@ -120,6 +119,24 @@ const EventDressCode = styled.p`
   font-size: 1rem;
 `;
 
+const CheckoutButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: lightseagreen;
+  color: #fff;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color:rgb(24, 128, 122);
+  }
+`;
+
+
 const JoinButton = styled.button.attrs((props) => ({
   // Prevent `isJoined` from being passed to the DOM
   isJoined: undefined,
@@ -151,11 +168,13 @@ const NoEventsMessage = styled.p`
 
 function EventMatches() {
   const { events: initialEvents } = useOutletContext();
+  const {setSelectedEventGroupId, setCreatingEvent} = useOutletContext();
   const [allEvents, setAllEvents] = useState([]);
   const [joinedEvents, setJoinedEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [user, setUser] = useState({});
   const [viewMode, setViewMode] = useState("all"); // "all" or "joined"
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userName = JSON.parse(
@@ -169,6 +188,23 @@ function EventMatches() {
         const userSwipedEvents = String(data.swipedEventsIds || "")
           .split(",")
           .map(Number);
+
+          facade
+          .getAllEventGroups()
+            .then((eventdata) => {
+            //console.log("Event groups:", eventdata);
+              for (const eventgroup of eventdata) {
+
+                if (userSwipedEvents.includes(eventgroup.event.id)) {
+                //userSwipedEvents.push(eventgroup.eventGroupId);
+                  console.log("User swiped event:", eventgroup.event.id);
+                }
+              }
+            }
+          );
+
+
+
         let userJoinedEvents = []; /*String(data.joinedEventsIds || "").split(",").map(Number)*/
 
         for (const eventgroup of data.eventGroups) {
@@ -208,8 +244,7 @@ function EventMatches() {
     facade.addEventGroupToUser(user.username, eventId).then(() => {
       setJoinedEvents([...joinedEvents, eventId]);
       console.log(
-        `Event group added to user: ${user.username}, Event ID: ${eventId}`
-      );
+        "Event group added to user:" + user.username + " Event ID: " + eventId);
     });
   };
 
@@ -223,18 +258,16 @@ function EventMatches() {
       .removeEventGroupFromUser(user.username, eventId)
       .then(() => {
         setJoinedEvents(joinedEvents.filter((id) => id !== eventId));
-        console.log(
-          `Event group removed from user: ${user.username}, Event ID: ${eventId}`
-        );
+        console.log(" Event group removed from user: " + user.username + " Event ID: " + eventId);
       })
       .catch((error) => {
         console.error("Error removing event group:", error);
       });
   };
 
-  if (!initialEvents || initialEvents.length === 0) {
+  /*if (!allEventGroups || allEventGroups.length === 0) {
     return <NoEventsMessage>No events available</NoEventsMessage>;
-  }
+  }*/
 
   return (
     <ThemeProvider theme={theme}>
@@ -256,38 +289,48 @@ function EventMatches() {
 
       <CardContainer>
         {filteredEvents.map((currentEvent) => (
-          <EventCard key={currentEvent.id}>
+          <EventCard key={currentEvent?.id}>
             <EventImage
-              src={`/assets/${currentEvent.eventName}.jpg`}
-              alt={currentEvent.eventName}
+              src={`/assets/${currentEvent?.eventName}.jpg`}
+              alt={currentEvent?.eventName}
               onError={(e) => {
                 e.target.src = "src/assets/Party.jpg"; // Fallback image
               }}
             />
             <EventDetails>
-              <EventTitle>{currentEvent.eventName}</EventTitle>
-              <EventDescription>{currentEvent.description}</EventDescription>
-              <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
-              <EventTags>Tags: {currentEvent.eventType}</EventTags>
+              <EventTitle>{currentEvent?.eventName}</EventTitle>
+              <EventDescription>{currentEvent?.description}</EventDescription>
+              <EventPrice>Price: ~{currentEvent?.estimatedPrice} Kr.</EventPrice>
+              <EventTags>Tags: {currentEvent?.eventType}</EventTags>
               <EventDressCode>
-                Dress Code: {currentEvent.dressCode}
+                Dress Code: {currentEvent?.dressCode}
               </EventDressCode>
+              <CheckoutButton
+                onClick={() =>{
+                  setSelectedEventGroupId(currentEvent?.id)
+                  navigate("/eventgroup/"+currentEvent?.id, )
+              }}>Checkout</CheckoutButton>
               <JoinButton
-                $isJoined={joinedEvents.includes(currentEvent.id)} // Pass as $isJoined
+                $isJoined={joinedEvents.includes(currentEvent?.id)} // Pass as $isJoined
                 onClick={() =>
-                  joinedEvents.includes(currentEvent.id)
-                    ? handleLeave(currentEvent.id)
-                    : handleJoin(currentEvent.id)
+                  joinedEvents.includes(currentEvent?.id)
+                    ? handleLeave(currentEvent?.id)
+                    : handleJoin(currentEvent?.id)
                 }
               >
-                {joinedEvents.includes(currentEvent.id) ? "Leave" : "Join"}
+                {joinedEvents.includes(currentEvent?.id) ? "Leave" : "Join"}
               </JoinButton>
             </EventDetails>
           </EventCard>
         ))}
       </CardContainer>
       <ButtonContainer>
-        <CreateButton>
+        <CreateButton
+        onClick={() =>{
+                  setCreatingEvent(true);
+                  navigate("/eventgroup/999");
+              }}
+          >
           +
         </CreateButton>
       </ButtonContainer>

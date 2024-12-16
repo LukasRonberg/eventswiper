@@ -12,6 +12,7 @@ const Container = styled.div`
   padding: 0;
   background-color: ${(props) => props.theme.colors.background};
   color: #333;
+  height: 90vh;
 `;
 
 const Title = styled.h1`
@@ -22,7 +23,7 @@ const Title = styled.h1`
 `;
 
 const CardContainer = styled.div`
-
+  //margin-bottom: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,9 +32,10 @@ const CardContainer = styled.div`
 `;
 
 const EventCard = styled.div`
+margin-top: 0px;
   position: absolute;
   width: 100%;
-  max-width: 500px;
+  max-width: 800px;
   height: 90%;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -55,8 +57,33 @@ const EventTitle = styled.h2`
 `;
 
 const EventDescription = styled.p`
-  margin: 10px 20px;
-  height: 20%;
+  color: #555;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const EventPrice = styled.p`
+  font-size: 1.5rem;
+  color: #2ecc71;
+  font-weight: bold;
+`;
+
+const EventTags = styled.p`
+  color: #3498db;
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+`;
+
+const EventDressCode = styled.p`
+  color: #f39c12;
+  font-size: 1.3rem;
+`;
+
+const EventExtras = styled.div`
+  margin-top: 100px;
 `;
 
 const ReturnButton = styled.button`
@@ -78,7 +105,7 @@ const ReturnButton = styled.button`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: 0px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   height: 75px;
@@ -204,7 +231,7 @@ function Home() {
       <CardContainer>
         {currentIndex < events.length ? (
           <EventCard key={currentEvent.id}>
-            <ReturnButton onClick={previousEvent}>←</ReturnButton>
+{/*           <ReturnButton onClick={previousEvent}>←</ReturnButton> */}
             <EventTitle>{currentEvent.eventName}</EventTitle>
             <EventImage
               src={`/assets/${currentEvent.eventName}.jpg`}
@@ -215,9 +242,11 @@ function Home() {
               }}
             />
             <EventDescription>{currentEvent.description}</EventDescription>
-            <p>Price: ~{currentEvent.estimatedPrice} Kr.</p>
-            <p>Tags: {currentEvent.eventType}</p>
-            <p>Dress Code: {currentEvent.dressCode}</p>
+            <EventExtras>
+              <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
+              <EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>
+              <EventTags>Tags: {currentEvent.eventType}</EventTags>
+            </EventExtras>
           </EventCard>
         ) : (
           <NoEvents>No more events available</NoEvents>
