@@ -108,7 +108,7 @@ function App() {
     facade.logout();
     setLoggedIn(false);
     setUser({});
-    navigate("/login")
+    navigate("/")
   };
 
   const login = (user, pass) => {
