@@ -133,8 +133,8 @@ function Forum() {
             throw new Error("Event not selected or invalid");
         }
 
-        const URL = "https://eventapi.lukasronberg.dk/api";
-        //const URL = "http://localhost:7070/api";
+        const URL = "https://eventapi.lukasronberg.dk/api/eventgroup/";
+        //const URL = "http://localhost:7070/api/eventgroup/";
 
         // Make sure the event is correctly passed to the backend
         const response = await fetch(URL, { //TODO: FIKS
