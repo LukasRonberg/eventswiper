@@ -238,7 +238,7 @@ function EventMatches() {
         //allEvents
         allEvents.filter(
           (event) =>
-            userSwipedEvents.includes(event.eventGroupNumber) ||
+            userSwipedEvents.includes(event.event.id) ||
             joinedEvents.includes(event.eventGroupNumber)
         )
       );
