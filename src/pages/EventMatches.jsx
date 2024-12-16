@@ -172,7 +172,7 @@ const NoEventsMessage = styled.p`
 `;
 
 function EventMatches() {
-  const {initialEvents, setInitialEvents } = useState([]);
+  const { initialEvents, setInitialEvents } = useState([]);
   const { setSelectedEventGroupId, setCreatingEvent } = useOutletContext();
   const [allEvents, setAllEvents] = useState([]);
   const [joinedEvents, setJoinedEvents] = useState([]);
@@ -186,31 +186,29 @@ function EventMatches() {
     const userName = JSON.parse(
       atob(localStorage.getItem("jwtToken").split(".")[1])
     ).username;
-  
+
     let userJoinedEvents = [];
     let userSwipedEvents2 = [];
     let allAllEvents = [];
-  
+
     facade
       .getUserById(userName)
       .then((userData) => {
         const userSwipedEventNumbers = String(userData.swipedEventsIds || "")
           .split(",")
           .map(Number);
-  
+
         return facade.getAllEventGroups().then((eventData) => {
           eventData.forEach((eventGroup) => {
             allAllEvents.push(eventGroup);
-  
+
             // Check if the event group matches swiped events
-            if (
-              userSwipedEventNumbers.includes(eventGroup.eventGroupNumber)
-            ) {
+            if (userSwipedEventNumbers.includes(eventGroup.eventGroupNumber)) {
               //if (!userJoinedEvents.includes(eventGroup.eventGroupId)) {
-                userSwipedEvents2.push(eventGroup.eventGroupNumber);
+              userSwipedEvents2.push(eventGroup.eventGroupNumber);
               //}
             }
-  
+
             // Add user's joined event groups
             userData.eventGroups.forEach((userEventGroup) => {
               if (!userJoinedEvents.includes(userEventGroup.eventGroupId)) {
@@ -224,7 +222,7 @@ function EventMatches() {
           setAllEvents(allAllEvents);
           setUserSwipedEvents(userSwipedEvents2);
           setUser(userData);
-  
+
           //console.log("User joined events:", userJoinedEvents);
           //console.log("All events:", allAllEvents);
         });
@@ -233,17 +231,22 @@ function EventMatches() {
         console.error("Error fetching user or event data:", error);
       });
   }, []);
-  
 
   useEffect(() => {
     if (viewMode === "all") {
       setFilteredEvents(
         //allEvents
-        allEvents.filter((event) => userSwipedEvents.includes(event.eventGroupNumber) || joinedEvents.includes(event.eventGroupNumber))
+        allEvents.filter(
+          (event) =>
+            userSwipedEvents.includes(event.eventGroupNumber) ||
+            joinedEvents.includes(event.eventGroupNumber)
+        )
       );
     } else if (viewMode === "joined") {
       setFilteredEvents(
-        allEvents.filter((event) => joinedEvents.includes(event.eventGroupNumber))
+        allEvents.filter((event) =>
+          joinedEvents.includes(event.eventGroupNumber)
+        )
       );
     }
   }, [viewMode, allEvents, joinedEvents]);
@@ -320,24 +323,41 @@ function EventMatches() {
                 }}
               />
               <EventDetails>
-                <EventTitle>{currentEvent?.event.eventName}</EventTitle>
-                <EventDescription>{currentEvent?.event.description}</EventDescription>
+                {currentEvent?.eventGroupPrice !== currentEvent?.event?.estimatedPrice ? (
+                  <>
+                <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
+                <p>({currentEvent?.event.eventName})</p>
+                <EventDescription>
+                  {currentEvent?.eventGroupDescription}
+                </EventDescription>
                 <EventPrice>
                   Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
                 </EventPrice>
-                {currentEvent?.eventGroupPrice != currentEvent.event.estimatedPrice && (
-                  <tag>
-
+                    <EventPrice>
+                      Price per person: ~{currentEvent?.eventGroupPrice} Kr.
+                    </EventPrice>
+                    <EventTags>
+                      Date: {currentEvent?.eventDate?.toString() || "N/A"},
+                      Time: {currentEvent?.eventTime || "N/A"}
+                    </EventTags>
+                  </>
+                ) : (
+                  <>
+                  <EventTitle>{currentEvent?.event.eventName}</EventTitle>
+                  <EventDescription>
+                    {currentEvent?.event.description}
+                  </EventDescription>
                   <EventPrice>
-                    Price per person: ~{currentEvent?.eventGroupPrice} Kr.
+                    Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
                   </EventPrice>
-                  <EventTags>Date: {currentEvent?.eventDate.toString()}, Time: {currentEvent?.eventTime}</EventTags>
-                  </tag>
+                  </>
+
                 )}
+
                 <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
-                <EventDressCode>
+                {/* <EventDressCode>
                   Dress Code: {currentEvent?.event.dressCode}
-                </EventDressCode>
+                </EventDressCode> */}
                 <CheckoutButton
                   onClick={() => {
                     setSelectedEventGroupId(currentEvent?.eventGroupNumber);
@@ -347,14 +367,18 @@ function EventMatches() {
                   Checkout
                 </CheckoutButton>
                 <JoinButton
-                  $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
+                  $isJoined={joinedEvents.includes(
+                    currentEvent?.eventGroupNumber
+                  )} // Pass as $isJoined
                   onClick={() =>
                     joinedEvents.includes(currentEvent?.eventGroupNumber)
                       ? handleLeave(currentEvent?.eventGroupNumber)
                       : handleJoin(currentEvent?.eventGroupNumber)
                   }
                 >
-                  {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
+                  {joinedEvents.includes(currentEvent?.eventGroupNumber)
+                    ? "Leave"
+                    : "Join"}
                 </JoinButton>
               </EventDetails>
             </EventCard>

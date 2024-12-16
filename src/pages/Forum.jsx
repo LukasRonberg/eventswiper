@@ -108,7 +108,8 @@ function Forum() {
           console.error("Error sending message:", error);
       }
   };
-  const handleCreateEventGroup = async () => {
+  const handleCreateEventGroup = async (evt) => {
+    evt.preventDefault(); // Prevent page reload
     try {
       var eventgroupAmount = 0;
       await facade.getAllEventGroups().then((data) => {
@@ -117,11 +118,11 @@ function Forum() {
       });
 
       const eventGroupDTO = { //TODO: FØLG OP PÅ DETTE
-            //eventName: document.getElementById("eventName").value,
+            eventGroupTitle: document.getElementById("eventName").value,
             eventDate: document.getElementById("eventDate").value,
             eventTime: document.getElementById("eventTime").value,
             eventGroupPrice: parseFloat(document.getElementById("eventGroupPrice").value),
-            //description: document.getElementById("description").value,
+            eventGroupDescription: document.getElementById("description").value,
             event: events.find(event => event.eventName === document.getElementById("event").value), // Ensure you send the full event object here
             eventGroupNumber: eventgroupAmount +1, //TODO: FIKS DETTE?
           };
@@ -132,8 +133,11 @@ function Forum() {
             throw new Error("Event not selected or invalid");
         }
 
+        const URL = "https://eventapi.lukasronberg.dk/api";
+        //const URL = "http://localhost:7070/api";
+
         // Make sure the event is correctly passed to the backend
-        const response = await fetch(`http://localhost:7070/api/eventgroup/`, { //TODO: FIKS
+        const response = await fetch(URL, { //TODO: FIKS
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -150,7 +154,8 @@ function Forum() {
         const createdEventGroup = await response.json().then((data) => {data
           facade.addEventGroupToUser(JSON.parse(atob(facade.getToken().split('.')[1])).username, data.eventGroupNumber);
           console.log("Event group created successfully:", data);
-          navigate("/eventgroup/" + data.eventGroupNumber); //TODO: FIKS
+          //navigate("/eventgroup/" + data.eventGroupNumber); //TODO: FIKS
+          navigate("/events"); //TODO: FIKS
         });
         setCreatingEvent(false);
         
@@ -163,9 +168,10 @@ function Forum() {
 
   return creatingEvent ? (
       <EventGroupDetails>
+        <form onSubmit={handleCreateEventGroup}>
           <h1>Event Details</h1>
           <h2>
-              Name: <input id="eventName" placeholder="Event Group Name" />
+              Name: <input id="eventName" placeholder="Event Group Name" required/>
           </h2>
           <h2>
               Event type:
@@ -178,18 +184,19 @@ function Forum() {
               </select>
           </h2>
           <p>
-              <strong>Date:</strong> <input type="date" min="2025-01-01" id="eventDate" />
+              <strong>Date:</strong> <input type="date" min="2025-01-01" id="eventDate" value="2025-01-01" required/>
           </p>
           <p>
-              <strong>Time:</strong> <input type="time" id="eventTime" />
+              <strong>Time:</strong> <input type="time" id="eventTime" value="00:00" required/>
           </p>
           <p>
-              <strong>Price:</strong> <input type="number" id="eventGroupPrice" min="0" /> Kr.
+              <strong>Price:</strong> <input type="number" id="eventGroupPrice" min="0" required /> Kr.
           </p>
           <p>
-              <strong>Description:</strong> <input id="description" placeholder="Event description" />
+              <strong>Description:</strong> <input id="description" placeholder="Event description" required/>
           </p>
-          <Button onClick={handleCreateEventGroup}>Create</Button>
+          <Button type="submit" /*onClick={handleCreateEventGroup}*/>Create</Button>
+      </form>
       </EventGroupDetails>
   ) : (
       <ForumContainer>
