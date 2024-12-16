@@ -184,13 +184,13 @@ function Forum() {
               </select>
           </h2>
           <p>
-              <strong>Date:</strong> <input type="date" min="2025-01-01" id="eventDate" value="2025-01-01" required/>
+              <strong>Date:</strong> <input type="date" min="2025-01-01" id="eventDate" defaultValue="2025-01-01" required/>
           </p>
           <p>
-              <strong>Time:</strong> <input type="time" id="eventTime" value="00:00" required/>
+              <strong>Time:</strong> <input type="time" id="eventTime" defaultValue="00:00" required/>
           </p>
           <p>
-              <strong>Price:</strong> <input type="number" id="eventGroupPrice" min="0" required /> Kr.
+              <strong>Price:</strong> <input type="number" id="eventGroupPrice" min="0" required defaultValue="100" /> Kr.
           </p>
           <p>
               <strong>Description:</strong> <input id="description" placeholder="Event description" required/>

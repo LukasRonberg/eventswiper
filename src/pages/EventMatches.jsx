@@ -326,7 +326,7 @@ function EventMatches() {
                 {currentEvent?.eventGroupPrice !== currentEvent?.event?.estimatedPrice ? (
                   <>
                 <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
-                <p>({currentEvent?.event.eventName})</p>
+                <p>({currentEvent?.event.eventName} - Custom)</p>
                 <EventDescription>
                   {currentEvent?.eventGroupDescription}
                 </EventDescription>
