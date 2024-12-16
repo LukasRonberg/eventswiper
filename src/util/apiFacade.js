@@ -97,9 +97,9 @@ const addEventToUser = (userId, eventid, swipedOrNo) => {
   return fetch(URL + `/user/${userId}/event/${eventid}/${swipedOrNo}`, options).then(handleHttpErrors);
 };
 
-const addEventGroupToUser = (userId, eventid) => {
-  const options = makeOptions("PUT", true, { userId, eventid });
-  return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
+const addEventGroupToUser = (userId, eventgroupid) => {
+  const options = makeOptions("PUT", true, { userId, eventid: eventgroupid });
+  return fetch(URL + `/user/${userId}/event/${eventgroupid}`, options).then(handleHttpErrors);
 };
 
 const getAllEventGroups = () => {

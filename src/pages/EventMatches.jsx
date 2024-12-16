@@ -20,8 +20,8 @@ const ButtonContainer = styled.div`
 `;
 
 const CreateButton = styled.button`
-padding: 20px 50px;
-margin-top: 20px;
+  padding: 20px 50px;
+  margin-top: 20px;
   font-size: 5rem;
   color: #fff;
   background-color: ${(props) => props.theme.colors.like};
@@ -29,26 +29,30 @@ margin-top: 20px;
   border-radius: 100%;
   cursor: pointer;
   transition: background-color 0.3s ease;
- &:hover {
+  &:hover {
     background-color: ${(props) => props.theme.colors.likeHover};
   }
 `;
 
 const FilterButton = styled.button.attrs((props) => ({
-    // Prevent `isJoined` from being passed to the DOM
-    isActive: undefined,
-  }))`
+  // Prevent `isJoined` from being passed to the DOM
+  isActive: undefined,
+}))`
   padding: 10px 20px;
   font-size: 1rem;
   color: #fff;
-  background-color: ${(props) => (props.$isActive ? props.theme.colors.like : props.theme.colors.dislike)};
+  background-color: ${(props) =>
+    props.$isActive ? props.theme.colors.like : props.theme.colors.dislike};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.$isActive ? props.theme.colors.likeHover : props.theme.colors.dislike)};
+    background-color: ${(props) =>
+      props.$isActive
+        ? props.theme.colors.likeHover
+        : props.theme.colors.dislike};
   }
 `;
 
@@ -132,10 +136,9 @@ const CheckoutButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color:rgb(24, 128, 122);
+    background-color: rgb(24, 128, 122);
   }
 `;
-
 
 const JoinButton = styled.button.attrs((props) => ({
   // Prevent `isJoined` from being passed to the DOM
@@ -155,7 +158,9 @@ const JoinButton = styled.button.attrs((props) => ({
 
   &:hover {
     background-color: ${(props) =>
-      props.$isJoined ? props.theme.colors.dislikeHover : props.theme.colors.likeHover};
+      props.$isJoined
+        ? props.theme.colors.dislikeHover
+        : props.theme.colors.likeHover};
   }
 `;
 
@@ -167,84 +172,96 @@ const NoEventsMessage = styled.p`
 `;
 
 function EventMatches() {
-  const { events: initialEvents } = useOutletContext();
-  const {setSelectedEventGroupId, setCreatingEvent} = useOutletContext();
+  const {initialEvents, setInitialEvents } = useState([]);
+  const { setSelectedEventGroupId, setCreatingEvent } = useOutletContext();
   const [allEvents, setAllEvents] = useState([]);
   const [joinedEvents, setJoinedEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [user, setUser] = useState({});
   const [viewMode, setViewMode] = useState("all"); // "all" or "joined"
   const navigate = useNavigate();
+  const [userSwipedEvents, setUserSwipedEvents] = useState([]);
 
   useEffect(() => {
     const userName = JSON.parse(
       atob(localStorage.getItem("jwtToken").split(".")[1])
     ).username;
-
+  
+    let userJoinedEvents = [];
+    let userSwipedEvents2 = [];
+    let allAllEvents = [];
+  
     facade
       .getUserById(userName)
-      .then((data) => {
-        //console.log("User data:", data); // Log the data to inspect its structure
-        const userSwipedEvents = String(data.swipedEventsIds || "")
+      .then((userData) => {
+        const userSwipedEventNumbers = String(userData.swipedEventsIds || "")
           .split(",")
           .map(Number);
-
-          facade
-          .getAllEventGroups()
-            .then((eventdata) => {
-            //console.log("Event groups:", eventdata);
-              for (const eventgroup of eventdata) {
-
-                if (userSwipedEvents.includes(eventgroup.event.id)) {
-                //userSwipedEvents.push(eventgroup.eventGroupId);
-                  console.log("User swiped event:", eventgroup.event.id);
-                }
-              }
+  
+        return facade.getAllEventGroups().then((eventData) => {
+          eventData.forEach((eventGroup) => {
+            allAllEvents.push(eventGroup);
+  
+            // Check if the event group matches swiped events
+            if (
+              userSwipedEventNumbers.includes(eventGroup.eventGroupNumber)
+            ) {
+              //if (!userJoinedEvents.includes(eventGroup.eventGroupId)) {
+                userSwipedEvents2.push(eventGroup.eventGroupNumber);
+              //}
             }
-          );
+  
+            // Add user's joined event groups
+            userData.eventGroups.forEach((userEventGroup) => {
+              if (!userJoinedEvents.includes(userEventGroup.eventGroupId)) {
+                userJoinedEvents.push(userEventGroup.eventGroupId);
+              }
+            });
+          });
 
-
-
-        let userJoinedEvents = []; /*String(data.joinedEventsIds || "").split(",").map(Number)*/
-
-        for (const eventgroup of data.eventGroups) {
-          //console.log("User groups:", eventgroup);
-          userJoinedEvents.push(eventgroup.eventGroupId);
-        }
-
-        console.log("User joined events:", userJoinedEvents);
-
-        setAllEvents([...userSwipedEvents]);
-        setJoinedEvents(userJoinedEvents);
-        setUser(data);
+          // Update state after processing all data
+          setJoinedEvents(userJoinedEvents);
+          setAllEvents(allAllEvents);
+          setUserSwipedEvents(userSwipedEvents2);
+          setUser(userData);
+  
+          //console.log("User joined events:", userJoinedEvents);
+          //console.log("All events:", allAllEvents);
+        });
       })
       .catch((error) => {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user or event data:", error);
       });
   }, []);
+  
 
   useEffect(() => {
     if (viewMode === "all") {
       setFilteredEvents(
-        initialEvents.filter((event) => allEvents.includes(event.id))
+        //allEvents
+        allEvents.filter((event) => userSwipedEvents.includes(event.eventGroupNumber) || joinedEvents.includes(event.eventGroupNumber))
       );
     } else if (viewMode === "joined") {
       setFilteredEvents(
-        initialEvents.filter((event) => joinedEvents.includes(event.id))
+        allEvents.filter((event) => joinedEvents.includes(event.eventGroupNumber))
       );
     }
-  }, [viewMode, allEvents, joinedEvents, initialEvents]);
+  }, [viewMode, allEvents, joinedEvents]);
 
   const handleJoin = (eventId) => {
     console.log("Joined:", eventId);
     addEventGroupToUser(eventId);
   };
 
-  const addEventGroupToUser = (eventId) => {
-    facade.addEventGroupToUser(user.username, eventId).then(() => {
-      setJoinedEvents([...joinedEvents, eventId]);
+  const addEventGroupToUser = (eventgroupid) => {
+    facade.addEventGroupToUser(user.username, eventgroupid).then(() => {
+      setJoinedEvents([...joinedEvents, eventgroupid]);
       console.log(
-        "Event group added to user:" + user.username + " Event ID: " + eventId);
+        "Event group added to user:" +
+          user.username +
+          " Event ID: " +
+          eventgroupid
+      );
     });
   };
 
@@ -258,83 +275,102 @@ function EventMatches() {
       .removeEventGroupFromUser(user.username, eventId)
       .then(() => {
         setJoinedEvents(joinedEvents.filter((id) => id !== eventId));
-        console.log(" Event group removed from user: " + user.username + " Event ID: " + eventId);
+        console.log(
+          " Event group removed from user: " +
+            user.username +
+            " Event ID: " +
+            eventId
+        );
       })
       .catch((error) => {
         console.error("Error removing event group:", error);
       });
   };
 
-  /*if (!allEventGroups || allEventGroups.length === 0) {
+  /*if (!allEvents || allEvents.length === 0) {
     return <NoEventsMessage>No events available</NoEventsMessage>;
   }*/
 
   return (
     <ThemeProvider theme={theme}>
-    <Container>
-      <ButtonContainer>
-        <FilterButton
-          $isActive={viewMode === "all"}
-          onClick={() => setViewMode("all")}
-        >
-          Explore All Liked Event Groups
-        </FilterButton>
-        <FilterButton
-          $isActive={viewMode === "joined"}
-          onClick={() => setViewMode("joined")}
-        >
-          Explore Joined Event Groups
-        </FilterButton>
-      </ButtonContainer>
-
-      <CardContainer>
-        {filteredEvents.map((currentEvent) => (
-          <EventCard key={currentEvent?.id}>
-            <EventImage
-              src={`/assets/${currentEvent?.eventName}.jpg`}
-              alt={currentEvent?.eventName}
-              onError={(e) => {
-                e.target.src = "src/assets/Party.jpg"; // Fallback image
-              }}
-            />
-            <EventDetails>
-              <EventTitle>{currentEvent?.eventName}</EventTitle>
-              <EventDescription>{currentEvent?.description}</EventDescription>
-              <EventPrice>Price: ~{currentEvent?.estimatedPrice} Kr.</EventPrice>
-              <EventTags>Tags: {currentEvent?.eventType}</EventTags>
-              <EventDressCode>
-                Dress Code: {currentEvent?.dressCode}
-              </EventDressCode>
-              <CheckoutButton
-                onClick={() =>{
-                  setSelectedEventGroupId(currentEvent?.id)
-                  navigate("/eventgroup/"+currentEvent?.id, )
-              }}>Checkout</CheckoutButton>
-              <JoinButton
-                $isJoined={joinedEvents.includes(currentEvent?.id)} // Pass as $isJoined
-                onClick={() =>
-                  joinedEvents.includes(currentEvent?.id)
-                    ? handleLeave(currentEvent?.id)
-                    : handleJoin(currentEvent?.id)
-                }
-              >
-                {joinedEvents.includes(currentEvent?.id) ? "Leave" : "Join"}
-              </JoinButton>
-            </EventDetails>
-          </EventCard>
-        ))}
-      </CardContainer>
-      <ButtonContainer>
-        <CreateButton
-        onClick={() =>{
-                  setCreatingEvent(true);
-                  navigate("/eventgroup/999");
-              }}
+      <Container>
+        <ButtonContainer>
+          <FilterButton
+            $isActive={viewMode === "all"}
+            onClick={() => setViewMode("all")}
           >
-          +
-        </CreateButton>
-      </ButtonContainer>
-    </Container>
+            Explore All Liked Event Groups
+          </FilterButton>
+          <FilterButton
+            $isActive={viewMode === "joined"}
+            onClick={() => setViewMode("joined")}
+          >
+            Explore Joined Event Groups
+          </FilterButton>
+        </ButtonContainer>
+
+        <CardContainer>
+          {filteredEvents.map((currentEvent) => (
+            <EventCard key={currentEvent?.eventGroupNumber}>
+              <EventImage
+                src={`/assets/${currentEvent?.event.eventName}.jpg`}
+                alt={currentEvent?.eventName}
+                onError={(e) => {
+                  e.target.src = "src/assets/Party.jpg"; // Fallback image
+                }}
+              />
+              <EventDetails>
+                <EventTitle>{currentEvent?.event.eventName}</EventTitle>
+                <EventDescription>{currentEvent?.event.description}</EventDescription>
+                <EventPrice>
+                  Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
+                </EventPrice>
+                {currentEvent?.eventGroupPrice != currentEvent.event.estimatedPrice && (
+                  <tag>
+
+                  <EventPrice>
+                    Price per person: ~{currentEvent?.eventGroupPrice} Kr.
+                  </EventPrice>
+                  <EventTags>Date: {currentEvent?.eventDate.toString()}, Time: {currentEvent?.eventTime}</EventTags>
+                  </tag>
+                )}
+                <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
+                <EventDressCode>
+                  Dress Code: {currentEvent?.event.dressCode}
+                </EventDressCode>
+                <CheckoutButton
+                  onClick={() => {
+                    setSelectedEventGroupId(currentEvent?.eventGroupNumber);
+                    navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
+                  }}
+                >
+                  Checkout
+                </CheckoutButton>
+                <JoinButton
+                  $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
+                  onClick={() =>
+                    joinedEvents.includes(currentEvent?.eventGroupNumber)
+                      ? handleLeave(currentEvent?.eventGroupNumber)
+                      : handleJoin(currentEvent?.eventGroupNumber)
+                  }
+                >
+                  {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
+                </JoinButton>
+              </EventDetails>
+            </EventCard>
+          ))}
+        </CardContainer>
+        <ButtonContainer>
+          <CreateButton
+            onClick={() => {
+              setCreatingEvent(true);
+              navigate("/eventgroup/999");
+            }}
+          >
+            +
+          </CreateButton>
+        </ButtonContainer>
+      </Container>
     </ThemeProvider>
   );
 }
