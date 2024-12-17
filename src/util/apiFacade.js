@@ -5,6 +5,11 @@ function handleHttpErrors(res) {
 if (!res.ok) {
   return Promise.reject({ status: res.status, fullError: res.json() })
 }
+
+if (res.status === 204) {
+  return Promise.resolve();
+}
+
 return res.json();
 }
 
@@ -145,6 +150,20 @@ const createMessage = (messageDTO) => {
   return fetch(`${URL}/eventgroup/${messageDTO.eventGroupId}/message`, options).then(handleHttpErrors);
 };
 
+const updateMessage = (messageDTO) => {
+  const options = makeOptions("PUT", true, messageDTO);
+  return fetch(`${URL}/eventgroup/${messageDTO.eventGroupId}/message/${messageDTO.id}`, options)
+    .then(handleHttpErrors);
+};
+
+const deleteMessage = (messageDTO) => {
+  const options = makeOptions("DELETE", true);
+  return fetch(`${URL}/eventgroup/${messageDTO.eventGroupId}/message/${messageDTO.id}`, options)
+    .then(handleHttpErrors);
+};
+
+
+
 
 const makeOptions= (method,addToken,body) =>{
   var opts = {
@@ -181,6 +200,8 @@ return {
     addEventGroupToUser,
     removeEventGroupFromUser,
     createMessage,
+    updateMessage,
+    deleteMessage,
     createEventGroup,
     getAllEventGroups
 }

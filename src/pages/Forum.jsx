@@ -68,11 +68,12 @@ const Button = styled.button`
 
 
 function Forum() {
-  const { selectedEventGroupId, events } = useOutletContext();
+  const { selectedEventGroupId, events, creatingEvent, setCreatingEvent, user } = useOutletContext();
   const [eventGroup, setEventGroup] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const { creatingEvent, setCreatingEvent } = useOutletContext();
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editText, setEditText] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -97,7 +98,7 @@ function Forum() {
       try {
           const messageDTO = {
               message: newMessage,
-              username: JSON.parse(atob(facade.getToken().split('.')[1])).username,
+              username: user.username,//JSON.parse(atob(facade.getToken().split('.')[1])).username,
               eventGroupId: parseInt(selectedEventGroupId, 10),
           };
 
@@ -165,6 +166,59 @@ function Forum() {
 };
 
 
+const handleEditMessage = (messageId, currentText) => {
+    setEditingMessageId(messageId);
+    setEditText(currentText);
+  };
+  
+  const handleSaveEdit = async () => {
+    try {
+      const updatedMessageDTO = {
+        id: editingMessageId,
+        eventGroupId: selectedEventGroupId,
+        message: editText,
+        username: user.username,
+      };
+  
+      await facade.updateMessage(updatedMessageDTO);
+  
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === editingMessageId ? { ...msg, message: editText } : msg
+        )
+      );
+  
+      setEditingMessageId(null);
+      setEditText("");
+    } catch (error) {
+      console.error("Error updating message:", error);
+    }
+  };
+  
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      const messageToDelete = {
+        id: messageId,
+        eventGroupId: selectedEventGroupId,
+      };
+  
+      await facade.deleteMessage(messageToDelete);
+  
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, message: "*Deleted message*", deleted: true }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
+  };
+  
+  
+
+
 
   return creatingEvent ? (
       <EventGroupDetails>
@@ -199,51 +253,113 @@ function Forum() {
       </form>
       </EventGroupDetails>
   ) : (
-      <ForumContainer>
-          <EventGroupDetails>
-              <h2>{eventGroup?.eventName}</h2>
-              <p>
-                  <strong>Date:</strong> {eventGroup?.eventDate}
+    <ForumContainer>
+      <EventGroupDetails>
+        <h2>{eventGroup?.eventName}</h2>
+        <p>
+          <strong>Date:</strong> {eventGroup?.eventDate}
+        </p>
+        <p>
+          <strong>Time:</strong> {eventGroup?.eventTime}
+        </p>
+        <p>
+          <strong>Price:</strong> {eventGroup?.eventGroupPrice} Kr.
+        </p>
+        <p>
+          <strong>Description:</strong> {eventGroup?.description || "No description available."}
+        </p>
+      </EventGroupDetails>
+  
+      <MessagesContainer>
+        <h3>Messages</h3>
+        {messages.length > 0 ? (
+  messages.map((message) => (
+    <Message key={message.id}>
+      <div>
+        {editingMessageId === message.id ? (
+          <>
+            {/* Input Field for Editing */}
+            <input
+              type="text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              style={{ width: "100%", marginBottom: "10px" }}
+            />
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                style={{ backgroundColor: "lightgreen", cursor: "pointer" }}
+                onClick={handleSaveEdit}
+              >
+                Save
+              </button>
+              <button
+                style={{ backgroundColor: "lightgray", cursor: "pointer" }}
+                onClick={() => setEditingMessageId(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+            <>
+            {/* Display "Deleted message" for deleted messages */}
+            {message.message === "*Deleted message*" ? (
+              <p style={{ fontStyle: "italic", color: "gray" }}>
+                <strong>{message.username}:</strong> {message.message}
               </p>
-              <p>
-                  <strong>Time:</strong> {eventGroup?.eventTime}
-              </p>
-              <p>
-                  <strong>Price:</strong> {eventGroup?.eventGroupPrice} Kr.
-              </p>
-              <p>
-                  <strong>Description:</strong> {eventGroup?.description || "No description available."}
-              </p>
-          </EventGroupDetails>
-          <MessagesContainer>
-              <h3>Messages</h3>
-              {messages.length > 0 ? (
-                  messages.map((message) => (
-                      <Message key={message.id}>
-                          <p>
-                              <strong>{message.username}:</strong> {message.message}
-                          </p>
-                          <p style={{ fontSize: "0.8rem", color: "#555" }}>
-                              {new Date(message.timestamp).toLocaleString()}
-                          </p>
-                      </Message>
-                  ))
-              ) : (
-                  <p>No messages yet. Be the first to post!</p>
-              )}
-              <MessageForm onSubmit={handleSendMessage}>
-                  <Input
-                      type="text"
-                      placeholder="Write your message here..."
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      required
-                  />
-                  <Button type="submit">Send Message</Button>
-              </MessageForm>
-          </MessagesContainer>
-      </ForumContainer>
-  );
+            ) : (
+              <>
+                {/* Default Message Display */}
+                <p>
+                  <strong>{message.username}:</strong> {message.message}
+                </p>
+                <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                  {new Date(message.timestamp).toLocaleString()}
+                </p>
+              </>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Edit/Delete Buttons for the Owner */}
+      {message.username === user.username && !editingMessageId && (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            style={{ backgroundColor: "lightblue", cursor: "pointer" }}
+            onClick={() => handleEditMessage(message.id, message.message)}
+          >
+            Edit
+          </button>
+          <button
+            style={{ backgroundColor: "lightcoral", cursor: "pointer" }}
+            onClick={() => handleDeleteMessage(message.id)}
+            >
+            Delete
+          </button>
+        </div>
+      )}
+    </Message>
+  ))
+) : (
+  <p>No messages yet. Be the first to post!</p>
+)}
+
+  
+        {/* Message Form */}
+        <MessageForm onSubmit={handleSendMessage}>
+          <Input
+            type="text"
+            placeholder="Write your message here..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            required
+          />
+          <Button type="submit">Send Message</Button>
+        </MessageForm>
+      </MessagesContainer>
+    </ForumContainer>
+  ); 
 }
 
 export default Forum;
