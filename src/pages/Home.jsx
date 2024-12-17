@@ -153,6 +153,8 @@ function Home() {
   const [events, setEvents] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [allEvents, setAllEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     // Decode username from JWT token
@@ -165,6 +167,7 @@ function Home() {
 
       // Combine the arrays and set to state
       setAllEvents([...userSwipedEvents, ...userUnSwipedEvents]);
+      setLoading(false);
     });
   }, []); // Runs once on component mount
 
@@ -218,6 +221,10 @@ function Home() {
       setCurrentIndex((prevIndex) => prevIndex - 1);
     }
   };
+
+  if (loading) {
+    return <NoEvents>Loading events...</NoEvents>;
+  }
 
   if (!events || events.length === 0) {
     return <NoEvents>No events available</NoEvents>;
