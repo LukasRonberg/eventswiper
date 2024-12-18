@@ -61,8 +61,15 @@ const CardContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 0px;
 `;
+
+const EventTypeTitle = styled.h1`
+  justify-content: center;
+        text-align: center;
+        width: 100%;
+`;
+
 
 const EventCard = styled.div`
   background-color: #ffffff;
@@ -80,18 +87,18 @@ const EventCard = styled.div`
 
 const EventImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 175px;
   object-fit: cover;
   border-bottom: 2px solid #eee;
 `;
 
 const EventDetails = styled.div`
-  padding: 20px;
+  padding-bottom: 10px;
   text-align: center;
 `;
 
 const EventTitle = styled.h2`
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: #333;
   margin-bottom: 10px;
   font-weight: bold;
@@ -107,7 +114,7 @@ const EventDescription = styled.p`
 `;
 
 const EventPrice = styled.p`
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #2ecc71;
   font-weight: bold;
 `;
@@ -124,7 +131,7 @@ const EventDressCode = styled.p`
 `;
 
 const CheckoutButton = styled.button`
-  width: 100%;
+  width: 90%;
   padding: 12px;
   margin-top: 15px;
   background-color: lightseagreen;
@@ -144,7 +151,7 @@ const JoinButton = styled.button.attrs((props) => ({
   // Prevent `isJoined` from being passed to the DOM
   isJoined: undefined,
 }))`
-  width: 100%;
+  width: 90%;
   padding: 12px;
   margin-top: 15px;
   background-color: ${(props) =>
@@ -302,88 +309,109 @@ function EventMatches() {
             $isActive={viewMode === "all"}
             onClick={() => setViewMode("all")}
           >
-            Explore All Liked Event Groups
+            Explore All Liked
           </FilterButton>
           <FilterButton
             $isActive={viewMode === "joined"}
             onClick={() => setViewMode("joined")}
           >
-            Explore Joined Event Groups
+            Explore All Joined
           </FilterButton>
         </ButtonContainer>
 
+  <EventTypeTitle>Standard Events</EventTypeTitle>
         <CardContainer>
-          {filteredEvents.map((currentEvent) => (
-            <EventCard key={currentEvent?.eventGroupNumber}>
-              <EventImage
-                src={`/assets/${currentEvent?.event.eventName}.jpg`}
-                alt={currentEvent?.eventName}
-                onError={(e) => {
-                  e.target.src = "src/assets/Party.jpg"; // Fallback image
-                }}
-              />
-              <EventDetails>
-                {currentEvent?.eventGroupPrice !== currentEvent?.event?.estimatedPrice ? (
-                  <>
-                <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
-                <p>({currentEvent?.event.eventName} - Custom)</p>
-                <EventDescription>
-                  {currentEvent?.eventGroupDescription}
-                </EventDescription>
-                <EventPrice>
-                  Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
-                </EventPrice>
-                    <EventPrice>
-                      Price per person: ~{currentEvent?.eventGroupPrice} Kr.
-                    </EventPrice>
-                    <EventTags>
-                      Date: {currentEvent?.eventDate?.toString() || "N/A"},
-                      Time: {currentEvent?.eventTime || "N/A"}
-                    </EventTags>
-                  </>
-                ) : (
-                  <>
-                  <EventTitle>{currentEvent?.event.eventName}</EventTitle>
-                  <EventDescription>
-                    {currentEvent?.event.description}
-                  </EventDescription>
-                  <EventPrice>
-                    Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
-                  </EventPrice>
-                  </>
+  {/* Standard Events */}
+  {filteredEvents
+    .filter((event) => !event.eventGroupDescription && event.eventGroupPrice === event.event.estimatedPrice)
+    .map((currentEvent) => (
+      <EventCard key={currentEvent?.eventGroupNumber}>
+        <EventImage
+          src={`/assets/${currentEvent?.event.eventName}.jpg`}
+          alt={currentEvent?.eventName}
+          onError={(e) => {
+            e.target.src = "src/assets/Party.jpg"; // Fallback image
+          }}
+        />
+        <EventDetails>
+          <EventTitle>{currentEvent?.event.eventName}</EventTitle>
+          <EventDescription>{currentEvent?.event.description}</EventDescription>
+          <EventPrice>
+            Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
+          </EventPrice>
+          <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
+          <CheckoutButton
+            onClick={() => {
+              setSelectedEventGroupId(currentEvent?.eventGroupNumber);
+              navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
+            }}
+          >
+            Checkout
+          </CheckoutButton>
+          <JoinButton
+            $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
+            onClick={() =>
+              joinedEvents.includes(currentEvent?.eventGroupNumber)
+                ? handleLeave(currentEvent?.eventGroupNumber)
+                : handleJoin(currentEvent?.eventGroupNumber)
+            }
+          >
+            {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
+          </JoinButton>
+        </EventDetails>
+      </EventCard>
+    ))}
 
-                )}
+  {/* Custom Events */}
+  <EventTypeTitle>Custom Events</EventTypeTitle>
+  {filteredEvents
+    .filter((event) => event.eventGroupDescription || event.eventGroupPrice !== event.event.estimatedPrice)
+    .map((currentEvent) => (
+      <EventCard key={currentEvent?.eventGroupNumber}>
+        <EventImage
+          src={`/assets/${currentEvent?.event.eventName}.jpg`}
+          alt={currentEvent?.eventName}
+          onError={(e) => {
+            e.target.src = "src/assets/Party.jpg"; // Fallback image
+          }}
+        />
+        <EventDetails>
+          <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
+          <p>({currentEvent?.event.eventName} - Custom)</p>
+          <EventDescription>{currentEvent?.eventGroupDescription}</EventDescription>
+          <EventPrice>
+            Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
+          </EventPrice>
+          <EventPrice>
+            Price per person: ~{currentEvent?.eventGroupPrice} Kr.
+          </EventPrice>
+          <EventTags>
+            Date: {currentEvent?.eventDate?.toString() || "N/A"}, Time: {currentEvent?.eventTime || "N/A"}
+          </EventTags>
+          <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
+          <CheckoutButton
+            onClick={() => {
+              setSelectedEventGroupId(currentEvent?.eventGroupNumber);
+              navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
+            }}
+          >
+            Checkout
+          </CheckoutButton>
+          <JoinButton
+            $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
+            onClick={() =>
+              joinedEvents.includes(currentEvent?.eventGroupNumber)
+                ? handleLeave(currentEvent?.eventGroupNumber)
+                : handleJoin(currentEvent?.eventGroupNumber)
+            }
+          >
+            {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
+          </JoinButton>
+        </EventDetails>
+      </EventCard>
+    ))}
+</CardContainer>
 
-                <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
-                {/* <EventDressCode>
-                  Dress Code: {currentEvent?.event.dressCode}
-                </EventDressCode> */}
-                <CheckoutButton
-                  onClick={() => {
-                    setSelectedEventGroupId(currentEvent?.eventGroupNumber);
-                    navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
-                  }}
-                >
-                  Checkout
-                </CheckoutButton>
-                <JoinButton
-                  $isJoined={joinedEvents.includes(
-                    currentEvent?.eventGroupNumber
-                  )} // Pass as $isJoined
-                  onClick={() =>
-                    joinedEvents.includes(currentEvent?.eventGroupNumber)
-                      ? handleLeave(currentEvent?.eventGroupNumber)
-                      : handleJoin(currentEvent?.eventGroupNumber)
-                  }
-                >
-                  {joinedEvents.includes(currentEvent?.eventGroupNumber)
-                    ? "Leave"
-                    : "Join"}
-                </JoinButton>
-              </EventDetails>
-            </EventCard>
-          ))}
-        </CardContainer>
         <ButtonContainer>
           <CreateButton
             onClick={() => {

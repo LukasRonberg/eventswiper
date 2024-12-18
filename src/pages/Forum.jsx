@@ -134,31 +134,26 @@ function Forum() {
             throw new Error("Event not selected or invalid");
         }
 
-        const URL = "https://eventapi.lukasronberg.dk/api/eventgroup/";
-        //const URL = "http://localhost:7070/api/eventgroup/";
-
-        // Make sure the event is correctly passed to the backend
-        const response = await fetch(URL, { //TODO: FIKS
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${facade.getToken()}`,
-            },
-            body: JSON.stringify(eventGroupDTO),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Error creating event group");
+        try {
+          const response = await facade.createEventGroup(eventGroupDTO);
+          //console.log("Raw Response:", response); // The response is already an object
+        
+          // Use the response data directly
+          await facade.addEventGroupToUser(
+            JSON.parse(atob(facade.getToken().split(".")[1])).username,
+            response.eventGroupNumber
+          );
+        
+          //console.log("Event group created successfully:", response);
+        
+          // Navigate to events or specific group
+          navigate("/events");
+          setCreatingEvent(false);
+        } catch (error) {
+          console.error("Error creating event group:", error);
         }
-
-        const createdEventGroup = await response.json().then((data) => {data
-          facade.addEventGroupToUser(JSON.parse(atob(facade.getToken().split('.')[1])).username, data.eventGroupNumber);
-          console.log("Event group created successfully:", data);
-          //navigate("/eventgroup/" + data.eventGroupNumber); //TODO: FIKS
-          navigate("/events"); //TODO: FIKS
-        });
-        setCreatingEvent(false);
+        
+        
         
     } catch (error) {
         console.error("Error creating event group:", error);
