@@ -245,7 +245,7 @@ function Home() {
               alt={currentEvent.eventName}
               onError={(e) => {
                 console.log(`Image: ${currentEvent.eventName} not found`);
-                e.target.src = 'src/assets/Party.jpg'; // Fallback image
+                e.target.src = 'assets/Party.jpg'; // Fallback image
               }}
             />
             <EventDescription>{currentEvent.description}</EventDescription>

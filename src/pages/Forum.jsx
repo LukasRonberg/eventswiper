@@ -1,4 +1,4 @@
-import {useNavigate ,useOutletContext } from "react-router-dom";
+import {useNavigate ,useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import facade from "../util/apiFacade";
 import styled from "styled-components";
@@ -68,7 +68,8 @@ const Button = styled.button`
 
 
 function Forum() {
-  const { selectedEventGroupId, events, creatingEvent, setCreatingEvent, user } = useOutletContext();
+  const { events, creatingEvent, setCreatingEvent, user } = useOutletContext();
+  const { id } = useParams();
   const [eventGroup, setEventGroup] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -79,19 +80,19 @@ function Forum() {
   useEffect(() => {
       const fetchEventGroupDetails = async () => {
           try {
-              const eventGroupDetails = await facade.fetchDataForSpecificEventGroup(selectedEventGroupId);
+              const eventGroupDetails = await facade.fetchDataForSpecificEventGroup(id);
               setEventGroup(eventGroupDetails);
-              const eventMessages = await facade.fetchMessagesForEventGroup(selectedEventGroupId);
+              const eventMessages = await facade.fetchMessagesForEventGroup(id);
               setMessages(eventMessages);
           } catch (error) {
               console.error("Error fetching forum data:", error);
           }
       };
 
-      if (selectedEventGroupId) {
+      if (id) {
           fetchEventGroupDetails();
       }
-  }, [selectedEventGroupId]);
+  }, [id]);
 
   const handleSendMessage = async (e) => {
       e.preventDefault(); // Prevent page reload
@@ -99,7 +100,7 @@ function Forum() {
           const messageDTO = {
               message: newMessage,
               username: user.username,//JSON.parse(atob(facade.getToken().split('.')[1])).username,
-              eventGroupId: parseInt(selectedEventGroupId, 10),
+              eventGroupId: parseInt(id, 10),
           };
 
           const createdMessage = await facade.createMessage(messageDTO);
@@ -175,7 +176,7 @@ const handleEditMessage = (messageId, currentText) => {
     try {
       const updatedMessageDTO = {
         id: editingMessageId,
-        eventGroupId: selectedEventGroupId,
+        eventGroupId: id,
         message: editText,
         username: user.username,
       };
@@ -199,7 +200,7 @@ const handleEditMessage = (messageId, currentText) => {
     try {
       const messageToDelete = {
         id: messageId,
-        eventGroupId: selectedEventGroupId,
+        eventGroupId: id,
       };
   
       await facade.deleteMessage(messageToDelete);
