@@ -35,7 +35,7 @@ const EventCard = styled.div`
 margin-top: 0px;
   position: absolute;
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   height: 90%;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -58,9 +58,9 @@ const EventTitle = styled.h2`
 
 const EventDescription = styled.p`
   color: #555;
-  font-size: 2rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
-  height: 200px;
+  height: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
@@ -83,7 +83,7 @@ const EventDressCode = styled.p`
 `;
 
 const EventExtras = styled.div`
-  margin-top: 100px;
+  //margin-top: 100px;
 `;
 
 const ReturnButton = styled.button`

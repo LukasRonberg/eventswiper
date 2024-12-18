@@ -117,8 +117,8 @@ const removeEventGroupFromUser = (userId, eventid) => {
   return fetch(URL + `/user/${userId}/event/${eventid}`, options).then(handleHttpErrors);
 }
 
-const createEventGroup = () => {
-  const options = makeOptions("POST", true);
+const createEventGroup = (eventGroupDTO) => {
+  const options = makeOptions("POST", true, eventGroupDTO);
   return fetch(URL + "/eventgroup/", options).then(handleHttpErrors);
 }
 
