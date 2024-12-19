@@ -155,8 +155,10 @@ function Home() {
   const [allEvents, setAllEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  
 
   useEffect(() => {
+    console.log("Initial events:", initialEvents);
     // Decode username from JWT token
     const userName = JSON.parse(atob(localStorage.getItem("jwtToken").split('.')[1])).username;
 

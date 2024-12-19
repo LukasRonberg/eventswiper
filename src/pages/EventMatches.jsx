@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { styled, ThemeProvider } from "styled-components";
 import facade from "/src/util/apiFacade.js";
 import theme from "/src/util/theme";
+import { default as ReactSelect, components } from "react-select";
+import FilterInputsExport from "../../EventsMatchesStuff/FilteringInputs";
 // Styled Components
 
 const Container = styled.div`
@@ -17,20 +19,20 @@ const ButtonContainer = styled.div`
   justify-content: center;
   gap: 20px;
   margin-bottom: 20px;
+  max-height: 50px;
 `;
 
 const CreateButton = styled.button`
-  padding: 20px 50px;
-  margin-top: 20px;
-  font-size: 5rem;
+  padding: 10px 20px;
+  font-size: 1rem;
   color: #fff;
-  background-color: ${(props) => props.theme.colors.like};
+  background-color:rgb(163, 47, 192);
   border: none;
-  border-radius: 100%;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   &:hover {
-    background-color: ${(props) => props.theme.colors.likeHover};
+    background-color:rgb(119, 21, 122);
   }
 `;
 
@@ -52,7 +54,7 @@ const FilterButton = styled.button.attrs((props) => ({
     background-color: ${(props) =>
       props.$isActive
         ? props.theme.colors.likeHover
-        : props.theme.colors.dislike};
+        : props.theme.colors.dislikeHover};
   }
 `;
 
@@ -66,10 +68,9 @@ const CardContainer = styled.div`
 
 const EventTypeTitle = styled.h1`
   justify-content: center;
-        text-align: center;
-        width: 100%;
+  text-align: center;
+  width: 100%;
 `;
-
 
 const EventCard = styled.div`
   background-color: #ffffff;
@@ -178,6 +179,7 @@ const NoEventsMessage = styled.p`
   margin-top: 50px;
 `;
 
+
 function EventMatches() {
   const { initialEvents, setInitialEvents } = useState([]);
   const { setSelectedEventGroupId, setCreatingEvent } = useOutletContext();
@@ -188,6 +190,14 @@ function EventMatches() {
   const [viewMode, setViewMode] = useState("all"); // "all" or "joined"
   const navigate = useNavigate();
   const [userSwipedEvents, setUserSwipedEvents] = useState([]);
+  const [filters, setFilters] = useState({
+    name: "",
+    tag: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+  const [showStandardEvents, setShowStandardEvents] = useState(true);
+  const [showCustomEvents, setShowCustomEvents] = useState(true);
 
   useEffect(() => {
     const userName = JSON.parse(
@@ -297,13 +307,37 @@ function EventMatches() {
       });
   };
 
-  /*if (!allEvents || allEvents.length === 0) {
-    return <NoEventsMessage>No events available</NoEventsMessage>;
-  }*/
+  const filteredByCriteria = (events) =>
+    events.filter((event) => {
+      const matchesName = filters.name
+      ? event.event.eventName.toLowerCase().includes(filters.name.toLowerCase()) ||
+        event.eventGroupTitle?.toLowerCase().includes(filters.name.toLowerCase())
+      : true;
+
+      // Adjust this part to check if any of the selected tags match
+      const matchesTag =
+        filters.tag && filters.tag.length
+          ? filters.tag.some((selectedTag) =>
+              event.event.eventType
+                .toLowerCase()
+                .includes(selectedTag.toLowerCase())
+            )
+          : true;
+
+      const matchesPrice =
+        (!filters.minPrice ||
+          event.event.estimatedPrice >= Number(filters.minPrice)) &&
+        (!filters.maxPrice ||
+          event.event.estimatedPrice <= Number(filters.maxPrice));
+
+      return matchesName && matchesTag && matchesPrice;
+    });
 
   return (
     <ThemeProvider theme={theme}>
       <Container>
+        {/* Filter Buttons */}
+        <FilterInputsExport filters={filters} setFilters={setFilters}/>
         <ButtonContainer>
           <FilterButton
             $isActive={viewMode === "all"}
@@ -317,111 +351,162 @@ function EventMatches() {
           >
             Explore All Joined
           </FilterButton>
+                  {/* Create Button */}
+          <CreateButton
+            onClick={() => {
+              setCreatingEvent(true);
+              navigate("/eventgroup/99999");
+            }}
+          >
+            Create Event <strong>+</strong> 
+          </CreateButton>
         </ButtonContainer>
 
-  <EventTypeTitle>Standard Events</EventTypeTitle>
-        <CardContainer>
-  {/* Standard Events */}
-  {filteredEvents
-    .filter((event) => !event.eventGroupDescription && event.eventGroupPrice === event.event.estimatedPrice)
-    .map((currentEvent) => (
-      <EventCard key={currentEvent?.eventGroupNumber}>
-        <EventImage
-          src={`/assets/${currentEvent?.event.eventName}.jpg`}
-          alt={currentEvent?.eventName}
-          onError={(e) => {
-            e.target.src = "src/assets/Party.jpg"; // Fallback image
-          }}
-        />
-        <EventDetails>
-          <EventTitle>{currentEvent?.event.eventName}</EventTitle>
-          <EventDescription>{currentEvent?.event.description}</EventDescription>
-          <EventPrice>
-            Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
-          </EventPrice>
-          <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
-          <CheckoutButton
-            onClick={() => {
-              setSelectedEventGroupId(currentEvent?.eventGroupNumber);
-              navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
-            }}
-          >
-            Checkout
-          </CheckoutButton>
-          <JoinButton
-            $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
-            onClick={() =>
-              joinedEvents.includes(currentEvent?.eventGroupNumber)
-                ? handleLeave(currentEvent?.eventGroupNumber)
-                : handleJoin(currentEvent?.eventGroupNumber)
-            }
-          >
-            {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
-          </JoinButton>
-        </EventDetails>
-      </EventCard>
-    ))}
-
-  {/* Custom Events */}
-  <EventTypeTitle>Custom Events</EventTypeTitle>
-  {filteredEvents
-    .filter((event) => event.eventGroupDescription || event.eventGroupPrice !== event.event.estimatedPrice)
-    .map((currentEvent) => (
-      <EventCard key={currentEvent?.eventGroupNumber}>
-        <EventImage
-          src={`/assets/${currentEvent?.event.eventName}.jpg`}
-          alt={currentEvent?.eventName}
-          onError={(e) => {
-            e.target.src = "src/assets/Party.jpg"; // Fallback image
-          }}
-        />
-        <EventDetails>
-          <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
-          <p>({currentEvent?.event.eventName} - Custom)</p>
-          <EventDescription>{currentEvent?.eventGroupDescription}</EventDescription>
-          <EventPrice>
-            Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
-          </EventPrice>
-          <EventPrice>
-            Price per person: ~{currentEvent?.eventGroupPrice} Kr.
-          </EventPrice>
-          <EventTags>
-            Date: {currentEvent?.eventDate?.toString() || "N/A"}, Time: {currentEvent?.eventTime || "N/A"}
-          </EventTags>
-          <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
-          <CheckoutButton
-            onClick={() => {
-              setSelectedEventGroupId(currentEvent?.eventGroupNumber);
-              navigate("/eventgroup/" + currentEvent?.eventGroupNumber);
-            }}
-          >
-            Checkout
-          </CheckoutButton>
-          <JoinButton
-            $isJoined={joinedEvents.includes(currentEvent?.eventGroupNumber)} // Pass as $isJoined
-            onClick={() =>
-              joinedEvents.includes(currentEvent?.eventGroupNumber)
-                ? handleLeave(currentEvent?.eventGroupNumber)
-                : handleJoin(currentEvent?.eventGroupNumber)
-            }
-          >
-            {joinedEvents.includes(currentEvent?.eventGroupNumber) ? "Leave" : "Join"}
-          </JoinButton>
-        </EventDetails>
-      </EventCard>
-    ))}
-</CardContainer>
-
+        
+        {/* Create Button }
         <ButtonContainer>
           <CreateButton
             onClick={() => {
               setCreatingEvent(true);
-              navigate("/eventgroup/999");
+              navigate("/eventgroup/99999");
             }}
           >
             +
           </CreateButton>
-        </ButtonContainer>
+        </ButtonContainer>}
+
+
+        {/* Standard Events */}
+        <EventTypeTitle
+          onClick={() => setShowStandardEvents(!showStandardEvents)}
+        >
+          Standard Events {showStandardEvents ? "▼" : "▶"}
+        </EventTypeTitle>
+        {showStandardEvents && (
+          <CardContainer>
+            {filteredByCriteria(filteredEvents)
+              .filter(
+                (event) =>
+                  !event.eventGroupDescription &&
+                  event.eventGroupPrice === event.event.estimatedPrice
+              )
+              .map((currentEvent) => (
+                <EventCard key={currentEvent?.eventGroupNumber}>
+                  {/* Event Card Content */}
+                  <EventImage
+                    src={`/assets/${currentEvent?.event.eventName}.jpg`}
+                    alt={currentEvent?.eventName}
+                    onError={(e) => {
+                      e.target.src = "src/assets/Party.jpg"; // Fallback image
+                    }}
+                  />
+                  <EventDetails>
+                    <EventTitle>{currentEvent?.event.eventName}</EventTitle>
+                    <EventDescription>
+                      {currentEvent?.event.description}
+                    </EventDescription>
+                    <EventPrice>
+                      Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
+                    </EventPrice>
+                    <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
+                    <CheckoutButton
+                      onClick={() => {
+                        setSelectedEventGroupId(currentEvent?.eventGroupNumber);
+                        navigate(
+                          "/eventgroup/" + currentEvent?.eventGroupNumber
+                        );
+                      }}
+                    >
+                      Checkout
+                    </CheckoutButton>
+                    <JoinButton
+                      $isJoined={joinedEvents.includes(
+                        currentEvent?.eventGroupNumber
+                      )} // Pass as $isJoined
+                      onClick={() =>
+                        joinedEvents.includes(currentEvent?.eventGroupNumber)
+                          ? handleLeave(currentEvent?.eventGroupNumber)
+                          : handleJoin(currentEvent?.eventGroupNumber)
+                      }
+                    >
+                      {joinedEvents.includes(currentEvent?.eventGroupNumber)
+                        ? "Leave"
+                        : "Join"}
+                    </JoinButton>
+                  </EventDetails>
+                </EventCard>
+              ))}
+          </CardContainer>
+        )}
+
+        {/* Custom Events */}
+        <EventTypeTitle onClick={() => setShowCustomEvents(!showCustomEvents)}>
+          Custom Events {showCustomEvents ? "▼" : "▶"}
+        </EventTypeTitle>
+        {showCustomEvents && (
+          <CardContainer>
+            {filteredByCriteria(filteredEvents)
+              .filter(
+                (event) =>
+                  event.eventGroupDescription ||
+                  event.eventGroupPrice !== event.event.estimatedPrice
+              )
+              .map((currentEvent) => (
+                <EventCard key={currentEvent?.eventGroupNumber}>
+                  {/* Event Card Content */}
+                  <EventImage
+                    src={`/assets/${currentEvent?.event.eventName}.jpg`}
+                    alt={currentEvent?.eventName}
+                    onError={(e) => {
+                      e.target.src = "src/assets/Party.jpg"; // Fallback image
+                    }}
+                  />
+                  <EventDetails>
+                    <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
+                    <p>({currentEvent?.event.eventName} - Custom)</p>
+                    <EventDescription>
+                      {currentEvent?.eventGroupDescription}
+                    </EventDescription>
+                    <EventPrice>
+                      Estimated Price: ~{currentEvent?.event.estimatedPrice} Kr.
+                    </EventPrice>
+                    <EventPrice>
+                      Price per person: ~{currentEvent?.eventGroupPrice} Kr.
+                    </EventPrice>
+                    <EventTags>
+                      Date: {currentEvent?.eventDate?.toString() || "N/A"},
+                      Time: {currentEvent?.eventTime || "N/A"}
+                    </EventTags>
+                    <EventTags>Tags: {currentEvent?.event.eventType}</EventTags>
+                    <CheckoutButton
+                      onClick={() => {
+                        setSelectedEventGroupId(currentEvent?.eventGroupNumber);
+                        navigate(
+                          "/eventgroup/" + currentEvent?.eventGroupNumber
+                        );
+                      }}
+                    >
+                      Checkout
+                    </CheckoutButton>
+                    <JoinButton
+                      $isJoined={joinedEvents.includes(
+                        currentEvent?.eventGroupNumber
+                      )} // Pass as $isJoined
+                      onClick={() =>
+                        joinedEvents.includes(currentEvent?.eventGroupNumber)
+                          ? handleLeave(currentEvent?.eventGroupNumber)
+                          : handleJoin(currentEvent?.eventGroupNumber)
+                      }
+                    >
+                      {joinedEvents.includes(currentEvent?.eventGroupNumber)
+                        ? "Leave"
+                        : "Join"}
+                    </JoinButton>
+                  </EventDetails>
+                </EventCard>
+              ))}
+          </CardContainer>
+        )}
       </Container>
     </ThemeProvider>
   );
