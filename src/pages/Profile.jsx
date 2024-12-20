@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import styled from "styled-components";
 import facade from "../util/apiFacade";
+import { PrimaryButton, SecondaryButton } from "../util/buttons";
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -130,12 +131,12 @@ const Profile = () => {
             <ProfileInfo>
               <strong>Email:</strong> {formData.email}
             </ProfileInfo>
-            <button onClick={() => setIsEditing(true)}>Edit</button>
-            <button onClick={logout}>Logout</button>
+            <PrimaryButton onClick={() => setIsEditing(true)}>Edit</PrimaryButton>
+            <SecondaryButton onClick={logout}>Logout</SecondaryButton>
 
           </>
         )}
-        {isAdmin && <button onClick={() => setAdminMode(true)}>Go to Admin Page</button>}
+        {isAdmin && <PrimaryButton onClick={() => setAdminMode(true)}>Go to Admin Page</PrimaryButton>}
       </ProfileContent>
     </ProfileContainer>
   );
