@@ -13,6 +13,7 @@ import Register from './pages/Register.jsx';
 import EventMatches from './pages/EventMatches.jsx';
 import Forum from './pages/Forum.jsx';
 import LogIn from './pages/Login.jsx';
+import Admin from './pages/Admin.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,6 +35,7 @@ const router = createBrowserRouter(
       {/* Register Route */}
       <Route path="register" element={<Register />} errorElement={<Error500 />} />
       <Route path="login" element={<LogIn />} errorElement={<Error500 />} />
+      <Route path="admin" element={<Admin />} errorElement={<Error500 />} />
 
       
       {/* Event Details with Dynamic Route */}

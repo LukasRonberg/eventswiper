@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import styled from "styled-components";
 import facade from "../util/apiFacade";
 
@@ -32,9 +32,11 @@ const ProfileInfo = styled.div`
 `;
 
 const Profile = () => {
-  const { user, logout } = useOutletContext(); // Get user from parent route context
+  const { user, logout, setAdminMode } = useOutletContext(); // Get user from parent route context
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(user);
+  const isAdmin = facade.hasUserAccess("ADMIN", true);
+
 
   useEffect(() => {
     setFormData(user);
@@ -133,6 +135,7 @@ const Profile = () => {
 
           </>
         )}
+        {isAdmin && <button onClick={() => setAdminMode(true)}>Go to Admin Page</button>}
       </ProfileContent>
     </ProfileContainer>
   );

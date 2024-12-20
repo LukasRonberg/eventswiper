@@ -6,6 +6,7 @@ import theme from "./util/theme";
 import LogIn from "./pages/Login";
 import Register from "./pages/Register";
 import facade from "./util/apiFacade";
+import Admin from "./pages/Admin";
 
 const Content = styled.div`
   display: flex;
@@ -63,9 +64,18 @@ function App() {
   const [user,setUser] = useState({});
   const [selectedEventGroupId, setSelectedEventGroupId] = useState()
   const [creatingEvent, setCreatingEvent] = useState(false);
+  const [adminMode, setAdminMode] = useState(false);
+
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Check for a valid token on initial mount
+  useEffect(() => {
+    if (facade.loggedIn()) {
+      setLoggedIn(true);
+    }
+  }, []);
 
   useEffect(() => {
     setErrorMessage(null);
@@ -73,10 +83,16 @@ function App() {
 
   useEffect(() => {
     if (facade.loggedIn()) {
-      setLoggedIn(true);
       const token = facade.getToken();
       const username = getUsernameFromToken(token);
   
+      const isAdmin = facade.hasUserAccess("ADMIN", true);
+      if(isAdmin){
+        setAdminMode(isAdmin);
+        //navigate("/admin")
+      }
+      console.log(isAdmin);
+
       const fetchUser = async () => {
         try {
           const userDetails = await facade.getUserById(username);
@@ -139,6 +155,8 @@ function App() {
         ) : (
           <LogIn login={login} setIsRegistering={setIsRegistering}/>
         )
+      ) : adminMode ? (
+        <Admin setAdminMode={setAdminMode}/>
       ) : (
         <Content>
           <Navbar>
@@ -151,7 +169,7 @@ function App() {
           </Navbar>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent}}/>
+            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent,adminMode, setAdminMode}}/>
           </MainContent>
         </Content>
       )}

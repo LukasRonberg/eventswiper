@@ -162,6 +162,23 @@ const deleteMessage = (messageDTO) => {
     .then(handleHttpErrors);
 };
 
+const createEvent = (eventDTO) => {
+  const options = makeOptions("POST", true, eventDTO);
+  return fetch(`${URL}/event`, options)
+    .then(handleHttpErrors);
+}
+
+const updateEvent = (id, eventDTO) => {
+  const options = makeOptions("PUT", true, eventDTO);
+  return fetch(`${URL}/event/${id}`, options)
+    .then(handleHttpErrors);
+}
+
+const deleteEvent = (id) => {
+  const options = makeOptions("DELETE", true);
+  return fetch(`${URL}/event/${id}`, options)
+    .then(handleHttpErrors);
+}
 
 
 
@@ -203,7 +220,10 @@ return {
     updateMessage,
     deleteMessage,
     createEventGroup,
-    getAllEventGroups
+    getAllEventGroups,
+    createEvent,
+    updateEvent,
+    deleteEvent
 }
 }
 const facade = apiFacade();

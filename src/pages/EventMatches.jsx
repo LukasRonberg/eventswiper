@@ -4,7 +4,7 @@ import { styled, ThemeProvider } from "styled-components";
 import facade from "/src/util/apiFacade.js";
 import theme from "/src/util/theme";
 import { default as ReactSelect, components } from "react-select";
-import FilterInputsExport from "../../EventsMatchesStuff/FilteringInputs";
+import FilterInputsExport from "../../components/EventsMatchesStuff/FilteringInputs";
 // Styled Components
 
 const Container = styled.div`
