@@ -13,7 +13,7 @@ const ProfileContainer = styled.div`
 `;
 
 const ProfileContent = styled.div`
-  width: 400px;
+  width: 850px;
   padding: 40px;
   background: white;
   border-radius: 8px;
@@ -23,17 +23,18 @@ const ProfileContent = styled.div`
 
 const ProfileTitle = styled.h2`
   margin-bottom: 20px;
+  font-size: 60px;
   color: ${({ theme }) => theme.colors.primary};
 `;
 
 const ProfileInfo = styled.div`
-  margin: 10px 0;
-  font-size: 16px;
+  margin: 50px 0;
+  font-size: 30px;
   color: ${({ theme }) => theme.colors.text};
 `;
 
 const Profile = () => {
-  const { user, logout, setAdminMode } = useOutletContext(); // Get user from parent route context
+  const { user, setUser, logout, setAdminMode } = useOutletContext(); // Get user from parent route context
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(user);
   const isAdmin = facade.hasUserAccess("ADMIN", true);
@@ -56,10 +57,9 @@ const Profile = () => {
         password: formData.password || undefined, // Omit `password` if null
         age: parseInt(formData.age, 10), // Convert age to a number
       };
-      console.log("Sanitized Form Data:", sanitizedFormData);
     facade.updateUser(sanitizedFormData)
       .then((updatedUser) => {
-        alert("Profile updated successfully!");
+        setUser(sanitizedFormData);
         setIsEditing(false);
       })
       .catch((error) => {
@@ -85,10 +85,10 @@ const Profile = () => {
         {isEditing ? (
           <>
             <ProfileInfo>
-              <strong>Username:</strong> {formData.username}
+              <strong>Username</strong> <br/>{formData.username}
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Age:</strong>
+              <strong>Age</strong><br/>
               <input
                 type="number"
                 name="age"
@@ -97,7 +97,7 @@ const Profile = () => {
               />
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Phone Number:</strong>
+              <strong>Phone Number</strong><br/>
               <input
                 type="text"
                 name="phoneNumber"
@@ -106,7 +106,7 @@ const Profile = () => {
               />
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Email:</strong>
+              <strong>Email</strong><br/>
               <input
                 type="email"
                 name="email"
@@ -114,29 +114,29 @@ const Profile = () => {
                 onChange={handleChange}
               />
             </ProfileInfo>
-            <button onClick={handleSave}>Save</button>
-            <button onClick={() => setIsEditing(false)}>Cancel</button>
+            <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
+            <SecondaryButton onClick={() => setIsEditing(false)}>Cancel</SecondaryButton>
           </>
         ) : (
           <>
             <ProfileInfo>
-              <strong>Username:</strong> {user.username}
+              <strong>Username</strong> <br/>{user.username}
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Age:</strong> {formData.age}
+              <strong>Age</strong> <br/>{formData.age}
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Phone Number:</strong> {formData.phoneNumber}
+              <strong>Phone Number</strong> <br/>{formData.phoneNumber}
             </ProfileInfo>
             <ProfileInfo>
-              <strong>Email:</strong> {formData.email}
+              <strong>Email</strong> <br/>{formData.email}
             </ProfileInfo>
             <PrimaryButton onClick={() => setIsEditing(true)}>Edit</PrimaryButton>
             <SecondaryButton onClick={logout}>Logout</SecondaryButton>
 
           </>
         )}
-        {isAdmin && <PrimaryButton onClick={() => setAdminMode(true)}>Go to Admin Page</PrimaryButton>}
+        {isAdmin && !isEditing && <PrimaryButton onClick={() => setAdminMode(true)}>Go to Admin Page</PrimaryButton>}
       </ProfileContent>
     </ProfileContainer>
   );

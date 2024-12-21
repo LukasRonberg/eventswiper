@@ -169,7 +169,7 @@ function App() {
           </Navbar>
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events, user, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent,adminMode, setAdminMode}}/>
+            <Outlet context={{events, user, setUser, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent,adminMode, setAdminMode}}/>
           </MainContent>
         </Content>
       )}

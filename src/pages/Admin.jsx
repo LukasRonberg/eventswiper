@@ -133,7 +133,7 @@ function Admin({setAdminMode}) {
         <AdminTitleRow>
           <AdminTitle>Admin Page</AdminTitle>
           <PrimaryButton onClick={() => setShowCreatePopup(true)}>Create Event</PrimaryButton>
-          <SecondaryButton onClick={() => setAdminMode(false)}>Set admin to false</SecondaryButton>
+          <SecondaryButton onClick={() => setAdminMode(false)}>Set Admin Mode to false</SecondaryButton>
         </AdminTitleRow>
         <SearchInput 
           type="text" 
