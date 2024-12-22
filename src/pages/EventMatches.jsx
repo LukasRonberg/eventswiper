@@ -343,13 +343,13 @@ function EventMatches() {
             $isActive={viewMode === "all"}
             onClick={() => setViewMode("all")}
           >
-            Explore All Liked
+            Explore
           </FilterButton>
           <FilterButton
             $isActive={viewMode === "joined"}
             onClick={() => setViewMode("joined")}
           >
-            Explore All Joined
+            Joined
           </FilterButton>
                   {/* Create Button */}
           <CreateButton
@@ -358,7 +358,7 @@ function EventMatches() {
               navigate("/eventgroup/99999");
             }}
           >
-            Create Event <strong>+</strong> 
+            Create
           </CreateButton>
         </ButtonContainer>
 

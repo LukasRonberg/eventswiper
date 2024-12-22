@@ -148,12 +148,45 @@ const NoEvents = styled.p`
   color: #888;
 `;
 
+const UndoUnswipedButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 90px; /* Added height for consistent sizing */
+  margin: 20px auto; /* Center horizontally and add spacing */
+  padding: 10px 20px; /* Add internal spacing for a polished look */
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center; /* Center text within the button */
+  color: #ffffff;
+  background-color:rgb(52, 124, 219);
+  border: none;
+  border-radius: 10px; /* Changed to pixels for smoother corners */
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #2980b9; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+  }
+
+  &:active {
+    background-color: #1c6a9e; /* Even darker shade on click */
+    transform: translateY(0); /* Reset lift effect */
+  }
+`;
+
+
 function Home() {
   const { events: initialEvents } = useOutletContext();
   const [events, setEvents] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [allEvents, setAllEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({});
+  const [refresh, setRefresh] = useState();
 
   
 
@@ -168,10 +201,11 @@ function Home() {
       const userUnSwipedEvents = String(data.unswipedEventsIds || "").split(",").map(Number);
 
       // Combine the arrays and set to state
+      setUser(data);
       setAllEvents([...userSwipedEvents, ...userUnSwipedEvents]);
       setLoading(false);
     });
-  }, []); // Runs once on component mount
+  }, [refresh]); // Runs once on component mount
 
   useEffect(() => {
     if (allEvents.length > 0) {
@@ -180,14 +214,14 @@ function Home() {
       setEvents(filteredEvents);
 
       // Reset the current index if necessary
-      if (currentIndex >= filteredEvents.length) {
+      /*if (currentIndex >= filteredEvents.length) {
         setCurrentIndex(0);
-      }
+      }*/
     } else {
       // Initialize events if allEvents is not yet loaded
       setEvents(initialEvents);
     }
-  }, [allEvents, initialEvents, currentIndex]);
+  }, [allEvents, initialEvents, currentIndex, refresh]);
 
   const handleLike = () => {
     console.log("Liked:", events[currentIndex]);
@@ -224,53 +258,72 @@ function Home() {
     }
   };
 
+  const undoUnswiped = () => {
+    user.unswipedEventsIds = [];
+    facade.updateUser(user).then((data) => {
+      console.log("Unswiped events cleared for user:", user.username);
+      setCurrentIndex(0);
+      setRefresh(true);
+    })};
+
   if (loading) {
     return <NoEvents>Loading events...</NoEvents>;
   }
 
-  if (!events || events.length === 0) {
-    return <NoEvents>No events available</NoEvents>;
+  const currentEvent = events[currentIndex];
+
+  function NoMoreEvents(){
+    return (
+      <NoEvents>
+      <h2>
+        No more events available
+      </h2>
+      <UndoUnswipedButton onClick={undoUnswiped}>
+        Check Disliked
+      </UndoUnswipedButton>
+    </NoEvents>
+    )
   }
 
-  const currentEvent = events[currentIndex];
 
   return (
     <ThemeProvider theme={theme}>
-    <Container>
-      <CardContainer>
-        {currentIndex < events.length ? (
-          <EventCard key={currentEvent.id}>
-{/*           <ReturnButton onClick={previousEvent}>←</ReturnButton> */}
-            <EventTitle>{currentEvent.eventName}</EventTitle>
-            <EventImage
-              src={`/assets/${currentEvent.eventName}.jpg`}
-              alt={currentEvent.eventName}
-              onError={(e) => {
-                console.log(`Image: ${currentEvent.eventName} not found`);
-                e.target.src = 'assets/Party.jpg'; // Fallback image
-              }}
-            />
-            <EventDescription>{currentEvent.description}</EventDescription>
-            <EventExtras>
-              <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
-              <EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>
-              <EventTags>Tags: {currentEvent.eventType}</EventTags>
-            </EventExtras>
-          </EventCard>
-        ) : (
-          <NoEvents>No more events available</NoEvents>
+      <Container>
+        <CardContainer>
+          {!events || events.length === 0 ? (
+            NoMoreEvents()
+          ) : currentIndex < events.length ? (
+            <EventCard key={currentEvent.id}>
+              {/* <ReturnButton onClick={previousEvent}>←</ReturnButton> */}
+              <EventTitle>{currentEvent.eventName}</EventTitle>
+              <EventImage
+                src={`/assets/${currentEvent.eventName}.jpg`}
+                alt={currentEvent.eventName}
+                onError={(e) => {
+                  console.log(`Image: ${currentEvent.eventName} not found`);
+                  e.target.src = 'assets/Party.jpg'; // Fallback image
+                }}
+              />
+              <EventDescription>{currentEvent.description}</EventDescription>
+              <EventExtras>
+                <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
+                <EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>
+                <EventTags>Tags: {currentEvent.eventType}</EventTags>
+              </EventExtras>
+            </EventCard>
+          ) : (
+            NoMoreEvents()
+          )}
+        </CardContainer>
+  
+        {events && events.length > 0 && currentIndex < events.length && (
+          <ButtonContainer>
+            <Button className="dislike" onClick={handleDislike}>👎</Button>
+            <Button className="like" onClick={handleLike}>❤️</Button>
+          </ButtonContainer>
         )}
-      </CardContainer>
-
-      {currentIndex < events.length && (
-        <ButtonContainer>
-          <Button className="dislike" onClick={handleDislike}>👎</Button>
-          <Button className="like" onClick={handleLike}>❤️</Button>
-        </ButtonContainer>
-      )}
-    </Container>
+      </Container>
     </ThemeProvider>
   );
-}
-
+}  
 export default Home;
