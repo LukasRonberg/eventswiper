@@ -78,6 +78,7 @@ function Forum() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if(!creatingEvent) {
       const fetchEventGroupDetails = async () => {
           try {
               const eventGroupDetails = await facade.fetchDataForSpecificEventGroup(id);
@@ -92,7 +93,7 @@ function Forum() {
       if (id) {
           fetchEventGroupDetails();
       }
-  }, [id]);
+  }}, [id]);
 
   const handleSendMessage = async (e) => {
       e.preventDefault(); // Prevent page reload
@@ -110,6 +111,8 @@ function Forum() {
           console.error("Error sending message:", error);
       }
   };
+
+
   const handleCreateEventGroup = async (evt) => {
     evt.preventDefault(); // Prevent page reload
     try {
@@ -119,47 +122,71 @@ function Forum() {
         eventgroupAmount = data.length;
       });
 
-      const eventGroupDTO = { //TODO: FØLG OP PÅ DETTE
-            eventGroupTitle: document.getElementById("eventName").value,
-            eventDate: document.getElementById("eventDate").value,
-            eventTime: document.getElementById("eventTime").value,
-            eventGroupPrice: parseFloat(document.getElementById("eventGroupPrice").value),
-            eventGroupDescription: document.getElementById("description").value,
-            event: events.find(event => event.eventName === document.getElementById("event").value), // Ensure you send the full event object here
-            eventGroupNumber: eventgroupAmount +1, //TODO: FIKS DETTE?
-          };
+      const fileInput = document.getElementById("eventImage");
+      const file = fileInput.files[0];
 
-          //console.log("Event group DTO:", eventGroupDTO);
-        // Ensure the event object has all the required properties (id, eventName, etc.)
-        if (!eventGroupDTO.event) {
-            throw new Error("Event not selected or invalid");
-        }
+      if (!file) {
+        console.log("No file selected.");
+        return;
+      }
 
-        try {
-          const response = await facade.createEventGroup(eventGroupDTO);
-          //console.log("Raw Response:", response); // The response is already an object
-        
-          // Use the response data directly
-          await facade.addEventGroupToUser(
-            JSON.parse(atob(facade.getToken().split(".")[1])).username,
-            response.eventGroupNumber
-          );
-        
-          //console.log("Event group created successfully:", response);
-        
-          // Navigate to events or specific group
-          navigate("/events");
-          setCreatingEvent(false);
-        } catch (error) {
-          console.error("Error creating event group:", error);
-        }
-        
-        
-        
+      console.log("File selected:", file);
+
+      const eventGroupDTO = {
+        //TODO: FØLG OP PÅ DETTE
+        eventGroupTitle: document.getElementById("eventName").value,
+        eventDate: document.getElementById("eventDate").value,
+        eventTime: document.getElementById("eventTime").value,
+        eventGroupPrice: parseFloat(document.getElementById("eventGroupPrice").value),
+        eventGroupDescription: document.getElementById("description").value,
+        event: events.find((event) => event.eventName === document.getElementById("event").value), // Ensure you send the full event object here
+        eventGroupNumber: eventgroupAmount + 1, //TODO: FIKS DETTE?
+      };
+
+      try
+      {
+      await facade.uploadFile(file).then((data) => {
+        console.log("File uploaded:", data);
+      });
     } catch (error) {
-        console.error("Error creating event group:", error);
+      console.log("Error uploading file:", error);
     }
-};
+
+
+      /*UploadedFile file = ctx.uploadedFi  le("image");
+          if (file != null) {
+              Path targetPath = Paths.get("uploads/" + file.getFilename());
+              Files.copy(file.getContent(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+          }*/
+
+      //console.log("Event group DTO:", eventGroupDTO);
+      // Ensure the event object has all the required properties (id, eventName, etc.)
+      if (!eventGroupDTO.event) {
+        throw new Error("Event not selected or invalid");
+      }
+
+      try {
+        const response = await facade.createEventGroup(eventGroupDTO);
+        //console.log("Raw Response:", response); // The response is already an object
+
+        // Use the response data directly
+        await facade.addEventGroupToUser(
+          JSON.parse(atob(facade.getToken().split(".")[1])).username,
+          response.eventGroupNumber
+        );
+
+        //console.log("Event group created successfully:", response);
+
+        // Navigate to events or specific group
+        navigate("/events");
+        setCreatingEvent(false);
+      } catch (error) {
+        console.error("Error creating event group:", error);
+      }
+    } catch (error) {
+      console.error("Error creating event group:", error);
+    }
+  };
 
 
 const handleEditMessage = (messageId, currentText) => {
@@ -217,37 +244,60 @@ const handleEditMessage = (messageId, currentText) => {
 
 
   return creatingEvent ? (
-      <EventGroupDetails>
-        <form onSubmit={handleCreateEventGroup}>
-          <h1>Event Details</h1>
-          <h2>
-              Name: <input id="eventName" placeholder="Event Group Name" required/>
-          </h2>
-          <h2>
-              Event type:
-              <select id="event">
-                  {events.map((event) => (
-                      <option key={event.id} value={event.eventName}>
-                          {event.eventName}
-                      </option>
-                  ))}
-              </select>
-          </h2>
-          <p>
-              <strong>Date:</strong> <input type="date" min="2025-01-01" id="eventDate" defaultValue="2025-01-01" required/>
-          </p>
-          <p>
-              <strong>Time:</strong> <input type="time" id="eventTime" defaultValue="00:00" required/>
-          </p>
-          <p>
-              <strong>Price:</strong> <input type="number" id="eventGroupPrice" min="0" required defaultValue="100" /> Kr.
-          </p>
-          <p>
-              <strong>Description:</strong> <input id="description" placeholder="Event description" required/>
-          </p>
-          <Button type="submit" /*onClick={handleCreateEventGroup}*/>Create</Button>
+    <EventGroupDetails>
+      <form onSubmit={handleCreateEventGroup}>
+        <h1>Event Details</h1>
+        <p>
+          <strong>Image:</strong>
+          <input type="file" id="eventImage" accept="image/*" required />
+        </p>
+        <h2>
+          Name: <input id="eventName" placeholder="Event Group Name" required />
+        </h2>
+        <h2>
+          Event type:
+          <select id="event">
+            {events.map((event) => (
+              <option key={event.id} value={event.eventName}>
+                {event.eventName}
+              </option>
+            ))}
+          </select>
+        </h2>
+        <p>
+          <strong>Date:</strong>{" "}
+          <input
+            type="date"
+            min="2025-01-01"
+            id="eventDate"
+            defaultValue="2025-01-01"
+            required
+          />
+        </p>
+        <p>
+          <strong>Time:</strong>{" "}
+          <input type="time" id="eventTime" defaultValue="00:00" required />
+        </p>
+        <p>
+          <strong>Price:</strong>{" "}
+          <input
+            type="number"
+            id="eventGroupPrice"
+            min="0"
+            required
+            defaultValue="100"
+          />{" "}
+          Kr.
+        </p>
+        <p>
+          <strong>Description:</strong>{" "}
+          <input id="description" placeholder="Event description" required />
+        </p>
+        <Button type="submit" /*onClick={handleCreateEventGroup}*/>
+          Create
+        </Button>
       </form>
-      </EventGroupDetails>
+    </EventGroupDetails>
   ) : (
     <ForumContainer>
       <EventGroupDetails>
@@ -262,86 +312,94 @@ const handleEditMessage = (messageId, currentText) => {
           <strong>Price:</strong> {eventGroup?.eventGroupPrice} Kr.
         </p>
         <p>
-          <strong>Description:</strong> {eventGroup?.description || "No description available."}
+          <strong>Description:</strong>{" "}
+          {eventGroup?.description || "No description available."}
         </p>
       </EventGroupDetails>
-  
+
       <MessagesContainer>
         <h3>Messages</h3>
         {messages.length > 0 ? (
-  messages.map((message) => (
-    <Message key={message.id}>
-      <div>
-        {editingMessageId === message.id ? (
-          <>
-            {/* Input Field for Editing */}
-            <input
-              type="text"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                style={{ backgroundColor: "lightgreen", cursor: "pointer" }}
-                onClick={handleSaveEdit}
-              >
-                Save
-              </button>
-              <button
-                style={{ backgroundColor: "lightgray", cursor: "pointer" }}
-                onClick={() => setEditingMessageId(null)}
-              >
-                Cancel
-              </button>
-            </div>
-          </>
+          messages.map((message) => (
+            <Message key={message.id}>
+              <div>
+                {editingMessageId === message.id ? (
+                  <>
+                    {/* Input Field for Editing */}
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      style={{ width: "100%", marginBottom: "10px" }}
+                    />
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <button
+                        style={{
+                          backgroundColor: "lightgreen",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleSaveEdit}
+                      >
+                        Save
+                      </button>
+                      <button
+                        style={{
+                          backgroundColor: "lightgray",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setEditingMessageId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Display "Deleted message" for deleted messages */}
+                    {message.message === "*Deleted message*" ? (
+                      <p style={{ fontStyle: "italic", color: "gray" }}>
+                        <strong>{message.username}:</strong> {message.message}
+                      </p>
+                    ) : (
+                      <>
+                        {/* Default Message Display */}
+                        <p>
+                          <strong>{message.username}:</strong> {message.message}
+                        </p>
+                        <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                          {new Date(message.timestamp).toLocaleString()}
+                        </p>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Edit/Delete Buttons for the Owner */}
+              {message.username === user.username && !editingMessageId && (
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    style={{ backgroundColor: "lightblue", cursor: "pointer" }}
+                    onClick={() =>
+                      handleEditMessage(message.id, message.message)
+                    }
+                  >
+                    Edit
+                  </button>
+                  <button
+                    style={{ backgroundColor: "lightcoral", cursor: "pointer" }}
+                    onClick={() => handleDeleteMessage(message.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </Message>
+          ))
         ) : (
-            <>
-            {/* Display "Deleted message" for deleted messages */}
-            {message.message === "*Deleted message*" ? (
-              <p style={{ fontStyle: "italic", color: "gray" }}>
-                <strong>{message.username}:</strong> {message.message}
-              </p>
-            ) : (
-              <>
-                {/* Default Message Display */}
-                <p>
-                  <strong>{message.username}:</strong> {message.message}
-                </p>
-                <p style={{ fontSize: "0.8rem", color: "#555" }}>
-                  {new Date(message.timestamp).toLocaleString()}
-                </p>
-              </>
-            )}
-          </>
+          <p>No messages yet. Be the first to post!</p>
         )}
-      </div>
 
-      {/* Edit/Delete Buttons for the Owner */}
-      {message.username === user.username && !editingMessageId && (
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            style={{ backgroundColor: "lightblue", cursor: "pointer" }}
-            onClick={() => handleEditMessage(message.id, message.message)}
-          >
-            Edit
-          </button>
-          <button
-            style={{ backgroundColor: "lightcoral", cursor: "pointer" }}
-            onClick={() => handleDeleteMessage(message.id)}
-            >
-            Delete
-          </button>
-        </div>
-      )}
-    </Message>
-  ))
-) : (
-  <p>No messages yet. Be the first to post!</p>
-)}
-
-  
         {/* Message Form */}
         <MessageForm onSubmit={handleSendMessage}>
           <Input

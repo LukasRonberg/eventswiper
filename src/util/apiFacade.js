@@ -77,6 +77,21 @@ const getUserRoles = () => {
     } else return ""
 }
 
+const uploadFile = (file) => {
+
+  const formData = new FormData();
+  formData.append("file", file);
+  const options = {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${getToken()}`, // Include the authorization header if needed
+    },
+    body: formData,  // Pass formData directly as the body
+  };
+
+  return fetch(`${URL}/images/`, options).then(handleHttpErrors);
+}
+
 const hasUserAccess = (neededRole, loggedIn) => {
     const roles = getUserRoles().split(',')
     return loggedIn && roles.includes(neededRole)
@@ -223,7 +238,8 @@ return {
     getAllEventGroups,
     createEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    uploadFile,
 }
 }
 const facade = apiFacade();
