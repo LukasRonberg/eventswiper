@@ -19,20 +19,22 @@ const Navbar = styled.nav.attrs((props) => ({}))`
   width: 100%;
   background-color: ${(props) => props.theme.colors.appColor};
   color: white;
-  padding: 10px 0px;
+  padding: 10px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden; /* Prevent horizontal overflow */
 `;
 
 const NavItem = styled.button`
   flex: 1; /* Distribute items evenly */
+  width: 33%; /* Ensure items take up equal space */
+  //max-width: 150px; /* Constrain the width of items */
   background: none;
   color: ${(props) => (props.isActive ? '#ffffff' : 'white')}; /* Highlight active item */
-  font-size: 1.5rem;
+  font-size: 1.2rem; /* Adjust for better fit on smaller screens */
   margin: 5px;
-  //padding: 10px 15px;
   cursor: pointer;
   border: none;
   border-radius: 5px;
@@ -50,6 +52,66 @@ const NavItem = styled.button`
     background-color: rgba(255, 255, 255, 0.4); /* Slightly highlighted background for active item */
     font-weight: bold; /* Make active item stand out */
   `}
+
+  @media (max-width: 768px) {
+    font-size: 1rem; /* Adjust font size for smaller screens */
+    margin: 2px; /* Reduce margin on smaller screens */
+  }
+`;
+
+const MainContent = styled.div`
+  flex: 1;
+  background-color: #fafafa;
+  border-left: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+  overflow-y: auto; /* Allows vertical scrolling */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+  width: 100%; /* Ensures it spans the entire width */
+  box-sizing: border-box; /* Includes padding and border in the width calculation */
+
+  @media (max-width: 768px) {
+    border-left: none; /* Remove borders for mobile views */
+    border-right: none;
+  }
+`;
+
+
+/*
+const Navbar = styled.nav.attrs((props) => ({}))`
+  width: 100%;
+  background-color: ${(props) => props.theme.colors.appColor};
+  color: white;
+  padding: 10px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const NavItem = styled.button`
+  flex: 1; /* Distribute items evenly 
+  background: none;
+  color: ${(props) => (props.isActive ? '#ffffff' : 'white')}; /* Highlight active item 
+  font-size: 1.5rem;
+  margin: 5px;
+  //padding: 10px 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #c8e6c9; /* Hover effect 
+    background-color: rgba(255, 255, 255, 0.2); /* Light overlay effect 
+  }
+
+  ${(props) =>
+    props.isActive &&
+    `
+    background-color: rgba(255, 255, 255, 0.4); /* Slightly highlighted background for active item 
+    font-weight: bold; /* Make active item stand out 
+  `}
 `;
 
 
@@ -60,8 +122,8 @@ const MainContent = styled.div`
   background-color: #fafafa;
   border-left: 2px solid #ccc;
   border-right: 2px solid #ccc;
-  overflow-y: auto; /* Allows scrolling inside the main content */
-`;
+  overflow-y: auto; /* Allows scrolling inside the main content 
+`;*/
 
 const ErrorBanner = styled.div`
   background-color: #f8d7da;
