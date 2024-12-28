@@ -23,6 +23,7 @@ const ButtonContainer = styled.div`
 `;
 
 const CreateButton = styled.button`
+  width: 33%;
   padding: 10px 20px;
   font-size: 1rem;
   color: #fff;
@@ -41,6 +42,7 @@ const FilterButton = styled.button.attrs((props) => ({
   isActive: undefined,
 }))`
   padding: 10px 20px;
+  width: 33%;
   font-size: 1rem;
   color: #fff;
   background-color: ${(props) =>
@@ -131,11 +133,13 @@ const EventDressCode = styled.p`
   font-size: 1rem;
 `;
 
-const CheckoutButton = styled.button`
+const CheckoutButton = styled.button.attrs((props) => ({
+  // Prevent `isJoined` from being passed to the DOM
+}))`
   width: 90%;
   padding: 12px;
   margin-top: 15px;
-  background-color: lightseagreen;
+  background-color: ${(props) => props.theme.colors.appColor}; // Correctly access theme property
   color: #fff;
   font-size: 1.2rem;
   border: none;
@@ -147,6 +151,7 @@ const CheckoutButton = styled.button`
     background-color: rgb(24, 128, 122);
   }
 `;
+
 
 const JoinButton = styled.button.attrs((props) => ({
   // Prevent `isJoined` from being passed to the DOM

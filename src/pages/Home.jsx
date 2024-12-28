@@ -12,7 +12,7 @@ const Container = styled.div`
   padding: 0;
   background-color: ${(props) => props.theme.colors.background};
   color: #333;
-  height: 90vh;
+  height: 90%;
 `;
 
 const Title = styled.h1`
@@ -28,13 +28,14 @@ const CardContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 80vh;
+  width: 100%;
   position: relative;
 `;
 
 const EventCard = styled.div`
-margin-top: 0px;
-  position: absolute;
-  width: 100%;
+  margin-top: 0px;
+  //position: absolute;
+  width: 90%;
   max-width: 600px;
   height: 90%;
   background-color: #fff;
@@ -59,8 +60,8 @@ const EventTitle = styled.h2`
 const EventDescription = styled.p`
   color: #555;
   font-size: 1.2rem;
-  margin-bottom: 10px;
-  height: 80px;
+  margin: 10px;
+  height: 95px;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
@@ -307,7 +308,7 @@ function Home() {
               <EventDescription>{currentEvent.description}</EventDescription>
               <EventExtras>
                 <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
-                <EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>
+                {/*<EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>*/}
                 <EventTags>Tags: {currentEvent.eventType}</EventTags>
               </EventExtras>
             </EventCard>

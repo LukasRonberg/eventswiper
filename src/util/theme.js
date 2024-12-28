@@ -8,6 +8,7 @@ const theme = {
       likeHover: " #27ae60",
       dislike: " #e74c3c",
       dislikeHover: " #c0392b",
+      appColor: "lightseagreen",
     },
   };
   

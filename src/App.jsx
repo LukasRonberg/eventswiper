@@ -15,36 +15,51 @@ const Content = styled.div`
   color: #333;
 `;
 
-const Navbar = styled.nav`
-  background-color: lightseagreen;
+const Navbar = styled.nav.attrs((props) => ({}))`
+  width: 100%;
+  background-color: ${(props) => props.theme.colors.appColor};
   color: white;
-  margin: 0px 0px 0px 0px;
-  padding: 10px 20px;
+  padding: 10px 0px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const NavItem = styled.button`
-  width: 150px;
+  flex: 1; /* Distribute items evenly */
   background: none;
-  color: white;
-  font-size: 2rem;
-  margin: 0 0px;
+  color: ${(props) => (props.isActive ? '#ffffff' : 'white')}; /* Highlight active item */
+  font-size: 1.5rem;
+  margin: 5px;
+  //padding: 10px 15px;
   cursor: pointer;
-  transition: color 0.3s ease;
   border: none;
+  border-radius: 5px;
+  text-align: center;
+  transition: all 0.3s ease;
 
   &:hover {
-    color: #c8e6c9;
+    color: #c8e6c9; /* Hover effect */
+    background-color: rgba(255, 255, 255, 0.2); /* Light overlay effect */
   }
+
+  ${(props) =>
+    props.isActive &&
+    `
+    background-color: rgba(255, 255, 255, 0.4); /* Slightly highlighted background for active item */
+    font-weight: bold; /* Make active item stand out */
+  `}
 `;
 
-const MainContent = styled.div`
 
+
+const MainContent = styled.div`
   flex: 1;
-  padding: 5px;
+  //padding: 5px;
   background-color: #fafafa;
   border-left: 2px solid #ccc;
+  border-right: 2px solid #ccc;
   overflow-y: auto; /* Allows scrolling inside the main content */
 `;
 
@@ -61,11 +76,10 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [events, setEvents] = useState([]);
-  const [user,setUser] = useState({});
-  const [selectedEventGroupId, setSelectedEventGroupId] = useState()
+  const [user, setUser] = useState({});
+  const [selectedEventGroupId, setSelectedEventGroupId] = useState();
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [adminMode, setAdminMode] = useState(false);
-
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,9 +99,9 @@ function App() {
     if (facade.loggedIn()) {
       const token = facade.getToken();
       const username = getUsernameFromToken(token);
-  
+
       const isAdmin = facade.hasUserAccess("ADMIN", true);
-      if(isAdmin){
+      if (isAdmin) {
         setAdminMode(isAdmin);
         //navigate("/admin")
       }
@@ -96,45 +110,41 @@ function App() {
       const fetchUser = async () => {
         try {
           const userDetails = await facade.getUserById(username);
-          console.log('Fetched user details:', userDetails);  // Debugging here
+          console.log("Fetched user details:", userDetails); // Debugging here
           setUser(userDetails);
         } catch (error) {
-          console.error('Error fetching user details:', error);
+          console.error("Error fetching user details:", error);
         }
       };
-      
-  
+
       fetchUser(); // Now this function is async and awaited
     } else {
-      console.log("Logged in is false")
+      console.log("Logged in is false");
     }
   }, [loggedIn]);
-  
 
   const getUsernameFromToken = (token) => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       return payload.username;
     } catch (error) {
       console.error("Failed to decode the token or extract username:", error);
       return null;
     }
   };
-  
+
   const logout = () => {
     facade.logout();
     setLoggedIn(false);
     setUser({});
-    navigate("/")
+    navigate("/");
   };
 
   const login = (user, pass) => {
     facade.login(user, pass).then(() => {
-      setLoggedIn(true)
-      navigate("/")
-  });
-
-    
+      setLoggedIn(true);
+      navigate("/");
+    });
   };
 
   useEffect(() => {
@@ -145,7 +155,23 @@ function App() {
     }
   }, []);
 
-  
+  // Example Usage
+  const NavbarComponent = ({ activeItem }) => {
+    return (
+      <Navbar>
+        <NavItem isActive={activeItem === "/"} onClick={() => navigate("/")}>
+          <strong>Home</strong>
+        </NavItem>
+        <NavItem isActive={activeItem === "/events"} onClick={() => navigate("/events")}>
+          <strong>Matches</strong>
+        </NavItem>
+        <NavItem isActive={activeItem === "/profile"} onClick={() => navigate("/profile")}>
+          <strong>Profile</strong>
+        </NavItem>
+        {/*<NavItem onClick={logout}>Logout</NavItem>*/}
+      </Navbar>
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -153,23 +179,31 @@ function App() {
         isRegistering ? (
           <Register setIsRegistering={setIsRegistering} />
         ) : (
-          <LogIn login={login} setIsRegistering={setIsRegistering}/>
+          <LogIn login={login} setIsRegistering={setIsRegistering} />
         )
       ) : adminMode ? (
-        <Admin setAdminMode={setAdminMode}/>
+        <Admin setAdminMode={setAdminMode} />
       ) : (
         <Content>
-          <Navbar>
-            <div>
-              <NavItem onClick={() => navigate("/")}>Home</NavItem>
-              <NavItem onClick={() => navigate("/events")}>Matches</NavItem>
-              <NavItem onClick={() => navigate("/profile")}>Profile</NavItem>
-            </div>
-            {/*<NavItem onClick={logout}>Logout</NavItem>*/}
-          </Navbar>
+          {NavbarComponent && (
+            <NavbarComponent activeItem={location.pathname} />
+          )}
           <MainContent>
             {errorMessage && <ErrorBanner>{errorMessage}</ErrorBanner>}
-            <Outlet context={{events, user, setUser, selectedEventGroupId, setSelectedEventGroupId, logout, creatingEvent, setCreatingEvent,adminMode, setAdminMode}}/>
+            <Outlet
+              context={{
+                events,
+                user,
+                setUser,
+                selectedEventGroupId,
+                setSelectedEventGroupId,
+                logout,
+                creatingEvent,
+                setCreatingEvent,
+                adminMode,
+                setAdminMode,
+              }}
+            />
           </MainContent>
         </Content>
       )}
