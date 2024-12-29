@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import facade from "../../src/util/apiFacade";
+
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -20,10 +21,12 @@ const PopupContent = styled.div`
   padding: 40px;
   border-radius:8px;
   width: 600px;
+  /* Keep max-height and let scrolling containers handle overflow */
   max-height: 80vh;
   overflow-y: auto;
 `;
 
+/** Buttons and container styling **/
 const CloseButton = styled.button`
   background-color: lightcoral;
   color: white;
@@ -36,8 +39,21 @@ const CloseButton = styled.button`
 const MessageContainer = styled.div`
   background: #f0f0f0;
   margin: 10px 0;
-  padding: 15px;
+  padding: 10px;
   border-radius: 5px;
+`;
+
+/** 
+ * The scrollable area that holds all messages.
+ * Adjust max-height to fit your needs (e.g. 300px, 400px).
+ */
+const MessagesScrollArea = styled.div`
+  max-height: 380px;
+  overflow-y: auto;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
 `;
 
 function ForumPopup({ onClose, eventGroupId, user }) {
@@ -53,6 +69,7 @@ function ForumPopup({ onClose, eventGroupId, user }) {
         try {
           const eventGroupDetails = await facade.fetchDataForSpecificEventGroup(eventGroupId);
           setEventGroup(eventGroupDetails);
+
           const eventMessages = await facade.fetchMessagesForEventGroup(eventGroupId);
           setMessages(eventMessages);
         } catch (error) {
@@ -92,11 +109,13 @@ function ForumPopup({ onClose, eventGroupId, user }) {
         username: user.username,
       };
       await facade.updateMessage(updatedMessageDTO);
-      setMessages((prev) =>
-        prev.map((msg) =>
+
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
           msg.id === editingMessageId ? { ...msg, message: editText } : msg
         )
       );
+
       setEditingMessageId(null);
       setEditText("");
     } catch (error) {
@@ -108,8 +127,8 @@ function ForumPopup({ onClose, eventGroupId, user }) {
     try {
       const messageToDelete = { id: messageId, eventGroupId };
       await facade.deleteMessage(messageToDelete);
-      setMessages((prev) =>
-        prev.map((msg) =>
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
           msg.id === messageId
             ? { ...msg, message: "*Deleted message*", deleted: true }
             : msg
@@ -141,8 +160,9 @@ function ForumPopup({ onClose, eventGroupId, user }) {
           </div>
         )}
 
-        <div>
-          <h4>Messages</h4>
+        <h4>Messages</h4>
+        {/* Scrollable container for the message list */}
+        <MessagesScrollArea>
           {messages.length > 0 ? (
             messages.map((message) => (
               <MessageContainer key={message.id}>
@@ -187,6 +207,8 @@ function ForumPopup({ onClose, eventGroupId, user }) {
                     )}
                   </>
                 )}
+
+                {/* Edit/Delete Buttons (only shown if it's your own message) */}
                 {message.username === user.username && !editingMessageId && (
                   <div style={{ display: "flex", gap: "10px" }}>
                     <button
@@ -208,21 +230,21 @@ function ForumPopup({ onClose, eventGroupId, user }) {
           ) : (
             <p>No messages yet. Be the first to post!</p>
           )}
+        </MessagesScrollArea>
 
-          <form onSubmit={handleSendMessage} style={{ marginTop: "20px" }}>
-            <input
-              type="text"
-              placeholder="Write your message here..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              required
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-            <button style={{ padding: "8px 16px" }} type="submit">
-              Send
-            </button>
-          </form>
-        </div>
+        <form onSubmit={handleSendMessage} style={{ marginTop: "20px" }}>
+          <input
+            type="text"
+            placeholder="Write your message here..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            required
+            style={{ width: "100%", marginBottom: "10px" }}
+          />
+          <button style={{ padding: "8px 16px" }} type="submit">
+            Send
+          </button>
+        </form>
       </PopupContent>
     </PopupOverlay>
   );

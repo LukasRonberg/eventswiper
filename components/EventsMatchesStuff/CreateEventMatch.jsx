@@ -125,7 +125,7 @@ function CreateEventMatch({ onClose, user, onEventGroupCreated }) {
         <form onSubmit={handleCreateEventGroup}>
           <p>
             <strong>Image:</strong><br/>
-            <input type="file" id="eventImage" accept="image/*" />
+            <input type="file" id="eventImage" accept="image/*" required/>
           </p>
           <p>
             <strong>Name:</strong><br/>
