@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { styled, ThemeProvider } from "styled-components";
 import facade from "/src/util/apiFacade.js";
 import theme from "/src/util/theme";
+import CreateEventMatch from "../../components/EventsMatchesStuff/CreateEventMatch";
+import ForumPopup from "../../components/EventsMatchesStuff/ForumPopup";
 import { default as ReactSelect, components } from "react-select";
 import FilterInputsExport from "../../components/EventsMatchesStuff/FilteringInputs";
 // Styled Components
@@ -186,8 +188,11 @@ const NoEventsMessage = styled.p`
 
 
 function EventMatches() {
+  const [showCreatePopup, setShowCreatePopup] = useState(false);
+  const [showForumPopup, setShowForumPopup] = useState(false);
+
   const { initialEvents, setInitialEvents } = useState([]);
-  const { setSelectedEventGroupId, setCreatingEvent } = useOutletContext();
+  const { selectedEventGroupId, setSelectedEventGroupId, setCreatingEvent } = useOutletContext();
   const [allEvents, setAllEvents] = useState([]);
   const [joinedEvents, setJoinedEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -359,8 +364,9 @@ function EventMatches() {
                   {/* Create Button */}
           <CreateButton
             onClick={() => {
-              setCreatingEvent(true);
-              navigate("/eventgroup/99999");
+              {/*setCreatingEvent(true);
+              navigate("/eventgroup/99999");*/}
+              setShowCreatePopup(true);
             }}
           >
             Create
@@ -417,9 +423,8 @@ function EventMatches() {
                     <CheckoutButton
                       onClick={() => {
                         setSelectedEventGroupId(currentEvent?.eventGroupNumber);
-                        navigate(
-                          "/eventgroup/" + currentEvent?.eventGroupNumber
-                        );
+                        setShowForumPopup(true);
+                        {/*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/}
                       }}
                     >
                       Checkout
@@ -486,9 +491,8 @@ function EventMatches() {
                     <CheckoutButton
                       onClick={() => {
                         setSelectedEventGroupId(currentEvent?.eventGroupNumber);
-                        navigate(
-                          "/eventgroup/" + currentEvent?.eventGroupNumber
-                        );
+                        setShowForumPopup(true);
+                        {/*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/}
                       }}
                     >
                       Checkout
@@ -513,6 +517,26 @@ function EventMatches() {
           </CardContainer>
         )}
       </Container>
+
+      {showForumPopup && (
+     <ForumPopup
+       onClose={() => setShowForumPopup(false)}
+       eventGroupId={selectedEventGroupId}
+       user={user}
+     />
+   )}
+
+{showCreatePopup && (
+     <CreateEventMatch
+       onClose={() => setShowCreatePopup(false)}
+       user={user}
+       onEventGroupCreated={() => {
+         setShowCreatePopup(false);
+         // Possibly refresh or setAllEvents(...) if needed
+       }}
+     />
+   )}
+
     </ThemeProvider>
   );
 }
