@@ -347,7 +347,7 @@ function EventMatches() {
     <ThemeProvider theme={theme}>
       <Container>
         {/* Filter Buttons */}
-        <FilterInputsExport filters={filters} setFilters={setFilters}/>
+        <FilterInputsExport filters={filters} setFilters={setFilters} />
         <ButtonContainer>
           <FilterButton
             $isActive={viewMode === "all"}
@@ -361,11 +361,13 @@ function EventMatches() {
           >
             Joined
           </FilterButton>
-                  {/* Create Button */}
+          {/* Create Button */}
           <CreateButton
             onClick={() => {
-              {/*setCreatingEvent(true);
-              navigate("/eventgroup/99999");*/}
+              {
+                /*setCreatingEvent(true);
+              navigate("/eventgroup/99999");*/
+              }
               setShowCreatePopup(true);
             }}
           >
@@ -373,7 +375,6 @@ function EventMatches() {
           </CreateButton>
         </ButtonContainer>
 
-        
         {/* Create Button }
         <ButtonContainer>
           <CreateButton
@@ -405,10 +406,20 @@ function EventMatches() {
                 <EventCard key={currentEvent?.eventGroupNumber}>
                   {/* Event Card Content */}
                   <EventImage
-                    src={`/assets/${currentEvent?.event.eventName}.jpg`}
-                    alt={currentEvent?.eventName}
+                    src={facade.readFile(currentEvent?.event.eventName + ".jpg")}
+                    alt={currentEvent?.event.eventName}
                     onError={(e) => {
-                      e.target.src = "src/assets/Party.jpg"; // Fallback image
+                      try {
+                        console.log(
+                          `Image not found in routes trying frontend`
+                        );
+                        e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;
+                      } catch (error) {
+                        console.log(
+                          `Image: ${currentEvent.event.eventName} not found in frontend - default image used`
+                        );
+                        e.target.src = "assets/Party.jpg"; // Fallback image
+                      }
                     }}
                   />
                   <EventDetails>
@@ -424,7 +435,9 @@ function EventMatches() {
                       onClick={() => {
                         setSelectedEventGroupId(currentEvent?.eventGroupNumber);
                         setShowForumPopup(true);
-                        {/*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/}
+                        {
+                          /*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/
+                        }
                       }}
                     >
                       Checkout
@@ -465,10 +478,20 @@ function EventMatches() {
                 <EventCard key={currentEvent?.eventGroupNumber}>
                   {/* Event Card Content */}
                   <EventImage
-                    src={`/assets/${currentEvent?.event.eventName}.jpg`}
-                    alt={currentEvent?.eventName}
+                    src={facade.readFile(currentEvent.event.eventName + ".jpg")}
+                    alt={currentEvent.event.eventName}
                     onError={(e) => {
-                      e.target.src = "src/assets/Party.jpg"; // Fallback image
+                      try {
+                        console.log(
+                          `Image not found in routes trying frontend`
+                        );
+                        e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;
+                      } catch (error) {
+                        console.log(
+                          `Image: ${currentEvent.event.eventName} not found in frontend - default image used`
+                        );
+                        e.target.src = "assets/Party.jpg"; // Fallback image
+                      }
                     }}
                   />
                   <EventDetails>
@@ -492,7 +515,9 @@ function EventMatches() {
                       onClick={() => {
                         setSelectedEventGroupId(currentEvent?.eventGroupNumber);
                         setShowForumPopup(true);
-                        {/*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/}
+                        {
+                          /*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/
+                        }
                       }}
                     >
                       Checkout
@@ -519,24 +544,23 @@ function EventMatches() {
       </Container>
 
       {showForumPopup && (
-     <ForumPopup
-       onClose={() => setShowForumPopup(false)}
-       eventGroupId={selectedEventGroupId}
-       user={user}
-     />
-   )}
+        <ForumPopup
+          onClose={() => setShowForumPopup(false)}
+          eventGroupId={selectedEventGroupId}
+          user={user}
+        />
+      )}
 
-{showCreatePopup && (
-     <CreateEventMatch
-       onClose={() => setShowCreatePopup(false)}
-       user={user}
-       onEventGroupCreated={() => {
-         setShowCreatePopup(false);
-         // Possibly refresh or setAllEvents(...) if needed
-       }}
-     />
-   )}
-
+      {showCreatePopup && (
+        <CreateEventMatch
+          onClose={() => setShowCreatePopup(false)}
+          user={user}
+          onEventGroupCreated={() => {
+            setShowCreatePopup(false);
+            // Possibly refresh or setAllEvents(...) if needed
+          }}
+        />
+      )}
     </ThemeProvider>
   );
 }
