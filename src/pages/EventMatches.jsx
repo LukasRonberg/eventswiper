@@ -406,22 +406,27 @@ function EventMatches() {
                 <EventCard key={currentEvent?.eventGroupNumber}>
                   {/* Event Card Content */}
                   <EventImage
-                    src={facade.readFile(currentEvent?.event.eventName + ".jpg")}
-                    alt={currentEvent?.event.eventName}
+                    src={facade.readFile(currentEvent.event.eventName + ".jpg")}
+                    alt={currentEvent.event.eventName}
                     onError={(e) => {
-                      try {
+                      // Log the error to console for better debugging
+                      /*console.log(
+                        `Image not found for ${currentEvent.event.eventName}, trying frontend fallback`
+                      );
+
+                      // Attempt to load the image from the frontend assets directory
+                      e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;*/
+
+                      // If the second attempt fails, use a default fallback image
+                     // e.target.onerror = () => {
                         console.log(
-                          `Image not found in routes trying frontend`
+                          `Frontend image also not found for ${currentEvent.event.eventName}, using default image.`
                         );
-                        e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;
-                      } catch (error) {
-                        console.log(
-                          `Image: ${currentEvent.event.eventName} not found in frontend - default image used`
-                        );
-                        e.target.src = "assets/Party.jpg"; // Fallback image
-                      }
+                        e.target.src = "assets/default.jpg"; // Fallback to a default image
+                      //};
                     }}
                   />
+
                   <EventDetails>
                     <EventTitle>{currentEvent?.event.eventName}</EventTitle>
                     <EventDescription>
@@ -481,19 +486,24 @@ function EventMatches() {
                     src={facade.readFile(currentEvent.event.eventName + ".jpg")}
                     alt={currentEvent.event.eventName}
                     onError={(e) => {
-                      try {
+                      // Log the error to console for better debugging
+                      //console.log(
+                      //  `Image not found for ${currentEvent.event.eventName}, trying frontend fallback`
+                     // );
+
+                      // Attempt to load the image from the frontend assets directory
+                     // e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;
+
+                      // If the second attempt fails, use a default fallback image
+                     // e.target.onerror = () => {
                         console.log(
-                          `Image not found in routes trying frontend`
+                          `Frontend image also not found for ${currentEvent.event.eventName}, using default image.`
                         );
-                        e.target.src = `/assets/${currentEvent.event.eventName}.jpg`;
-                      } catch (error) {
-                        console.log(
-                          `Image: ${currentEvent.event.eventName} not found in frontend - default image used`
-                        );
-                        e.target.src = "assets/Party.jpg"; // Fallback image
-                      }
+                        e.target.src = "assets/Party.jpg"; // Fallback to a default image
+                      //};
                     }}
                   />
+
                   <EventDetails>
                     <EventTitle>{currentEvent?.eventGroupTitle}</EventTitle>
                     <p>({currentEvent?.event.eventName} - Custom)</p>

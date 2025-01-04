@@ -298,21 +298,32 @@ function Home() {
               {/* <ReturnButton onClick={previousEvent}>←</ReturnButton> */}
               <EventTitle>{currentEvent.eventName}</EventTitle>
               <EventImage
-                src={facade.readFile(currentEvent.eventName+".jpg")}
+                src={facade.readFile(currentEvent.eventName + ".jpg")}
                 alt={currentEvent.eventName}
                 onError={(e) => {
-                  try {
-                    console.log(`Image not found in routes trying frontend`);
-                    e.target.src = (`/assets/${currentEvent.eventName}.jpg`);
-                  } catch (error) {
-                    console.log(`Image: ${currentEvent.eventName} not found in frontend - default image used`);
-                    e.target.src = 'assets/Party.jpg'; // Fallback image
-                  }
+                  // Log the error to console for better debugging
+                 // console.log(
+                 //   `Image not found for ${currentEvent.eventName}, trying frontend fallback`
+                //  );
+
+                  // Attempt to load the image from the frontend assets directory
+                 // e.target.src = `/assets/${currentEvent.eventName}.jpg`;
+
+                  // If the second attempt fails, use a default fallback image
+                 // e.target.onerror = () => {
+                    console.log(
+                      `Frontend image also not found for ${currentEvent.eventName}, using default image.`
+                    );
+                    e.target.src = "assets/default.jpg"; // Fallback to a default image
+                 // };
                 }}
               />
+
               <EventDescription>{currentEvent.description}</EventDescription>
               <EventExtras>
-                <EventPrice>Price: ~{currentEvent.estimatedPrice} Kr.</EventPrice>
+                <EventPrice>
+                  Price: ~{currentEvent.estimatedPrice} Kr.
+                </EventPrice>
                 {/*<EventDressCode> Dress Code: {currentEvent.dressCode} </EventDressCode>*/}
                 <EventTags>Tags: {currentEvent.eventType}</EventTags>
               </EventExtras>
@@ -321,11 +332,15 @@ function Home() {
             NoMoreEvents()
           )}
         </CardContainer>
-  
+
         {events && events.length > 0 && currentIndex < events.length && (
           <ButtonContainer>
-            <Button className="dislike" onClick={handleDislike}>👎</Button>
-            <Button className="like" onClick={handleLike}>❤️</Button>
+            <Button className="dislike" onClick={handleDislike}>
+              👎
+            </Button>
+            <Button className="like" onClick={handleLike}>
+              ❤️
+            </Button>
           </ButtonContainer>
         )}
       </Container>
