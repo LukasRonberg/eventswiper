@@ -96,7 +96,6 @@ function Register({ setIsRegistering }) {
         loginCredentials.email
       );
       setError(""); // Clear any previous error
-      alert("User successfully registered!");
       setIsRegistering(false);
     } catch (err) {
       const errorMessage = err.fullError ? await err.fullError.message : "An error occurred during registration.";

@@ -84,10 +84,6 @@ const Table = styled.table`
   }
 `;
 
-
-
-
-
 function Admin({setAdminMode}) {
   const [allEvents, setAllEvents] = useState([]);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
@@ -95,7 +91,6 @@ function Admin({setAdminMode}) {
   const [updateEventId, setUpdateEventId] = useState(null);
   const [updateEventData, setUpdateEventData] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-
 
     useEffect(() => {
       facade.fetchDataForAllEvents().then(setAllEvents);
