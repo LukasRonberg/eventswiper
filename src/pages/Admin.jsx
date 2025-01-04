@@ -106,12 +106,40 @@ function Admin({setAdminMode}) {
         setAllEvents(prev => prev.filter(event => event.id !== id));
       });
     };
+
+    const uploadImage = async (evt) => {
+      const file = evt;
+  
+      if (!file) {
+        console.log("No file selected.");
+        return;
+      }
+  
+      console.log("File selected:", file);
+  
+      try {
+        await facade.uploadFile(file).then((data) => {
+          console.log("File uploaded:", data);
+        });
+      } catch (error) {
+        console.log("Error uploading file:", error);
+      }
+    };
     
     const handleCreate = (eventData) => {
-        facade.createEvent(eventData).then(created => {
+        const eventDataWithoutImage = ({
+          eventName: eventData.eventName,
+          estimatedPrice: eventData.estimatedPrice,
+          description: eventData.description,
+          dressCode: eventData.dressCode,
+          eventType: eventData.eventType,
+        }) //TODO: gør dette på en pænere måde????
+
+        facade.createEvent(eventDataWithoutImage).then(created => {
           setAllEvents(prev => [...prev, created]);
           setShowCreatePopup(false);
         });
+        uploadImage(eventData.eventImage);
       };
     
     const handleUpdate = (newData) => {
@@ -124,8 +152,10 @@ function Admin({setAdminMode}) {
       };
 
     const filteredEvents = allEvents.filter(event => 
-        event.eventName.toLowerCase().includes(searchQuery.toLowerCase())
-      );     
+      event
+        //event.eventName.toLowerCase().includes(searchQuery.toLowerCase()
+      //)
+      ); 
 
     return (
         <AdminContainer>

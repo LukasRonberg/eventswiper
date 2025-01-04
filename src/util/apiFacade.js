@@ -92,6 +92,10 @@ const uploadFile = (file) => {
   return fetch(`${URL}/images/`, options).then(handleHttpErrors);
 }
 
+const readFile = (filename) => {
+  return `${URL}/images/${filename}`;
+}
+
 const hasUserAccess = (neededRole, loggedIn) => {
     const roles = getUserRoles().split(',')
     return loggedIn && roles.includes(neededRole)
@@ -240,6 +244,7 @@ return {
     updateEvent,
     deleteEvent,
     uploadFile,
+    readFile,
 }
 }
 const facade = apiFacade();

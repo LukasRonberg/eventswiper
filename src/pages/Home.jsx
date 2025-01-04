@@ -298,11 +298,16 @@ function Home() {
               {/* <ReturnButton onClick={previousEvent}>←</ReturnButton> */}
               <EventTitle>{currentEvent.eventName}</EventTitle>
               <EventImage
-                src={`/assets/${currentEvent.eventName}.jpg`}
+                src={facade.readFile(currentEvent.eventName+".jpg")}
                 alt={currentEvent.eventName}
                 onError={(e) => {
-                  console.log(`Image: ${currentEvent.eventName} not found`);
-                  e.target.src = 'assets/Party.jpg'; // Fallback image
+                  try {
+                    console.log(`Image not found in routes trying frontend`);
+                    e.target.src = (`/assets/${currentEvent.eventName}.jpg`);
+                  } catch (error) {
+                    console.log(`Image: ${currentEvent.eventName} not found in frontend - default image used`);
+                    e.target.src = 'assets/Party.jpg'; // Fallback image
+                  }
                 }}
               />
               <EventDescription>{currentEvent.description}</EventDescription>
