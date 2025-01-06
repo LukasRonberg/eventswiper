@@ -93,7 +93,7 @@ const uploadFile = (file) => {
 }
 
 const readFile = (filename) => {
-  return `${URL}/images/${filename}`;
+  return `${URL}/images/${filename}`; 
 }
 
 const hasUserAccess = (neededRole, loggedIn) => {
