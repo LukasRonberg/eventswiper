@@ -46,8 +46,8 @@ const login = (username, password) => {
   const options = makeOptions("POST", false, { username, password });
   return fetch(`${URL}/auth/login`, options)
       .then(handleHttpErrors)
-      .then(res => {
-          setToken(res.token);
+      .then(data => {
+          setToken(data.token);
           if (loggedIn()) {     // Check if logged in after setting the token
               console.log("Login successful, token is valid.");
           } else {
@@ -244,7 +244,6 @@ return {
     updateEvent,
     deleteEvent,
     uploadFile,
-    readFile,
 }
 }
 const facade = apiFacade();
