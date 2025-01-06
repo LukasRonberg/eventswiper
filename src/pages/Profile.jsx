@@ -68,11 +68,21 @@ const Profile = () => {
       });
   };
 
-  if (!user || Object.keys(user).length === 0) {
+  if (!user) {
     return (
       <ProfileContainer>
         <ProfileContent>
           <h3>Loading...</h3>
+        </ProfileContent>
+      </ProfileContainer>
+    );
+  }
+  
+  if (Object.keys(user).length === 0) {
+    return (
+      <ProfileContainer>
+        <ProfileContent>
+          <h3 style={{ color: "red" }}>Error: User data is missing!</h3>
         </ProfileContent>
       </ProfileContainer>
     );
