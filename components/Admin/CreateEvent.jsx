@@ -45,6 +45,13 @@ function CreateEvent({ onClose, onCreate }) {
   return (
     <Popup onClose={onClose}>  
       <h3>Create Event</h3>
+      <p>Hvis fil vælges så sørg for at title matcher fil navn (-.jpg)</p>
+        <p>
+          <strong>Image:</strong>
+          <input type="file" id="eventImage" accept="image/*" 
+          name="eventImage" onChange={handleChange} /*value={formData.eventImage}*/
+          />
+        </p>
       <Input 
         placeholder="Event Name" 
         name="eventName" 

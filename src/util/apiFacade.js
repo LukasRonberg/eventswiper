@@ -244,6 +244,7 @@ return {
     updateEvent,
     deleteEvent,
     uploadFile,
+    readFile,
 }
 }
 const facade = apiFacade();
