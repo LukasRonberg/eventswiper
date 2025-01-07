@@ -1,5 +1,8 @@
-const URL = "https://eventapi.lukasronberg.dk/api";
-//const URL = "http://localhost:7070/api";
+const isLocalhost = window.location.hostname.includes("localhost");
+const URL = isLocalhost
+  ? "http://localhost:7070/api"
+  : "https://eventapi.lukasronberg.dk/api";
+
 
 function handleHttpErrors(res) {
 if (!res.ok) {

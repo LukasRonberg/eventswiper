@@ -76,25 +76,20 @@ function LogIn({ login, setIsRegistering }) {
   const [loginCredentials, setLoginCredentials] = useState(init);
   const [error, setError] = useState("");
 
-
-  const performLogin = async (evt) => {
-    evt.preventDefault(); // Prevent the default form submission
-  
-    try {
-      // Attempt to log in and wait for the result
-      await login(loginCredentials.username, loginCredentials.password);
-  
-      // Clear error and proceed
-      setError("");
-      setIsRegistering(false);
-    } catch (error) {
-      // Handle login failure
-      console.log(error);
-      setError("Invalid username or password. Please try again.");
-    }
+  const performLogin = (loginFunction) => {
+    return async function(evt) {
+      evt.preventDefault();
+      try {
+        await loginFunction(loginCredentials.username, loginCredentials.password);
+        setError("");
+        setIsRegistering(false);
+      } catch (error) {
+        console.log(error);
+        setError("Invalid username or password. Please try again.");
+      }
+    };
   };
   
-
   const onSwitchToRegister = () =>{
     setIsRegistering(true);
   }
@@ -110,7 +105,7 @@ function LogIn({ login, setIsRegistering }) {
     <LoginContent>
       <LoginMainContent>
         <LoginTitle>Login</LoginTitle>
-        <StyledForm onSubmit={performLogin}>
+        <StyledForm onSubmit={performLogin(login)}>
           <Input
             placeholder="User Name"
             id="username"
