@@ -4,16 +4,16 @@ const URL = isLocalhost
   : "https://eventapi.lukasronberg.dk/api";
 
 
-function handleHttpErrors(res) {
-if (!res.ok) {
-  return Promise.reject({ status: res.status, fullError: res.json() })
+function handleHttpErrors(response) {
+if (!response.ok) {
+  return Promise.reject({ status: response.status, fullError: response.json() })
 }
 
-if (res.status === 204) {
+if (response.status === 204) {
   return Promise.resolve();
 }
 
-return res.json();
+return response.json();
 }
 
 function apiFacade() {

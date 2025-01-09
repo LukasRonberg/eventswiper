@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
-import Popup from "../Popup";
+import Popup from "./Popup";
 import { useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../../src/util/buttons";
 

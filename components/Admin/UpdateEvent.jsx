@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import React from "react";
 import { PrimaryButton, SecondaryButton } from "../../src/util/buttons";
-import Popup from "../Popup";
+import Popup from "./Popup";
 
 const Input = styled.input`
   width:100%;
