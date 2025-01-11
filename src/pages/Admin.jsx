@@ -91,6 +91,8 @@ function Admin({setAdminMode}) {
   const [updateEventId, setUpdateEventId] = useState(null);
   const [updateEventData, setUpdateEventData] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState("");
+
 
     useEffect(() => {
       facade.fetchDataForAllEvents().then(setAllEvents);
@@ -122,6 +124,11 @@ function Admin({setAdminMode}) {
     };
     
     const handleCreate = (eventData) => {
+      if (!eventData.eventName || !eventData.estimatedPrice || !eventData.description || !eventData.dressCode || !eventData.eventType) {
+        setError("All fields must be filled out before creating an event.");
+        return; // Stop function execution if validation fails
+      }
+
         const eventDataWithoutImage = ({
           eventName: eventData.eventName,
           estimatedPrice: eventData.estimatedPrice,
@@ -210,6 +217,7 @@ function Admin({setAdminMode}) {
             <CreateEvent 
               onClose={() => setShowCreatePopup(false)} 
               onCreate={handleCreate} 
+              error={error}
             />
           )}
     

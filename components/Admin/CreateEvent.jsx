@@ -16,7 +16,13 @@ const Select = styled.select`
   margin-bottom: 10px;
 `;
 
-function CreateEvent({ onClose, onCreate }) {
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+`;
+
+function CreateEvent({ onClose, onCreate, error }) {
   const [formData, setFormData] = useState({
     eventName: "",
     estimatedPrice: "",
@@ -88,6 +94,7 @@ function CreateEvent({ onClose, onCreate }) {
           <option key={et} value={et}>{et}</option>
         ))}
       </Select>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
       <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
     </Popup>

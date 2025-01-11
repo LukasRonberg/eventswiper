@@ -362,7 +362,7 @@ function EventMatches() {
             Joined
           </FilterButton>
           {/* Create Button */}
-          <CreateButton onClick={() => {setShowCreatePopup(true);}}>
+          <CreateButton onClick={() => setShowCreatePopup(true)}>
             Create
           </CreateButton>
         </ButtonContainer>

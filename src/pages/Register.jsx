@@ -118,7 +118,7 @@ function Register({ setIsRegistering }) {
     <RegisterContent>
       <RegisterMainContent>
         <RegisterTitle>Register User</RegisterTitle>
-        <StyledForm onSubmit={performRegister}>
+        <StyledForm onSubmit={performRegister} onClick={() => console.log("Form clicked!")}>
           <Input
             placeholder="User Name"
             id="username"
