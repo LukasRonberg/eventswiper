@@ -362,31 +362,10 @@ function EventMatches() {
             Joined
           </FilterButton>
           {/* Create Button */}
-          <CreateButton
-            onClick={() => {
-              {
-                /*setCreatingEvent(true);
-              navigate("/eventgroup/99999");*/
-              }
-              setShowCreatePopup(true);
-            }}
-          >
+          <CreateButton onClick={() => {setShowCreatePopup(true);}}>
             Create
           </CreateButton>
         </ButtonContainer>
-
-        {/* Create Button }
-        <ButtonContainer>
-          <CreateButton
-            onClick={() => {
-              setCreatingEvent(true);
-              navigate("/eventgroup/99999");
-            }}
-          >
-            +
-          </CreateButton>
-        </ButtonContainer>}
-
 
         {/* Standard Events */}
         <EventTypeTitle
@@ -440,9 +419,6 @@ function EventMatches() {
                       onClick={() => {
                         setSelectedEventGroupId(currentEvent?.eventGroupNumber);
                         setShowForumPopup(true);
-                        {
-                          /*navigate("/eventgroup/" + currentEvent?.eventGroupNumber);*/
-                        }
                       }}
                     >
                       Checkout
