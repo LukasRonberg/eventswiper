@@ -84,7 +84,7 @@ const Table = styled.table`
   }
 `;
 
-function Admin({setAdminMode}) {
+function Admin({setAdminMode, logout}) {
   const [allEvents, setAllEvents] = useState([]);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
@@ -166,6 +166,7 @@ function Admin({setAdminMode}) {
           <AdminTitle>Admin Page</AdminTitle>
           <PrimaryButton onClick={() => setShowCreatePopup(true)}>Create Event</PrimaryButton>
           <SecondaryButton onClick={() => setAdminMode(false)}>Set Admin Mode to false</SecondaryButton>
+          <SecondaryButton onClick={logout}> Logout </SecondaryButton>
         </AdminTitleRow>
         <SearchInput 
           type="text" 

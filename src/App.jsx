@@ -146,6 +146,10 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.body.addEventListener("click", (event) => console.log("Body clicked!", event));
+  }, []);
+
   // Check for a valid token on initial mount
   useEffect(() => {
     if (facade.loggedIn()) {
@@ -244,7 +248,7 @@ function App() {
           <LogIn login={login} setIsRegistering={setIsRegistering} />
         )
       ) : adminMode ? (
-        <Admin setAdminMode={setAdminMode} />
+        <Admin setAdminMode={setAdminMode} logout={logout} />
       ) : (
         <Content>
           {NavbarComponent && (
