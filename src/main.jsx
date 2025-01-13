@@ -39,9 +39,10 @@ const router = createBrowserRouter(
 
       
       {/* Event Details with Dynamic Route */}
-      <Route path="events" element={<EventMatches />} errorElement={<Error500 />} />
-
-      <Route path="eventgroup/:id" element={<Forum />} errorElement={<Error500 />} />
+      <Route path="events" element={<EventMatches />} errorElement={<Error500 />}>
+      {/* Sub-route for a specific event */}
+      <Route path=":id" element={<Forum />} errorElement={<Error500 />} />
+      </Route>
 
       
       {/* 404 Fallback */}

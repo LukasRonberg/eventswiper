@@ -33,6 +33,13 @@ const ProfileInfo = styled.div`
   color: ${({ theme }) => theme.colors.text};
 `;
 
+const ErrorMessage = styled.h3`
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+`;
+
 const Profile = () => {
   const { user, setUser, logout, setAdminMode } = useOutletContext(); // Get user from parent route context
   const [isEditing, setIsEditing] = useState(false);
@@ -52,11 +59,13 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    const sanitizedFormData = {
-        ...formData,
-        password: formData.password || undefined, // Omit `password` if null
-        age: parseInt(formData.age, 10), // Convert age to a number
-      };
+    const { password, age, ...otherDetails } = formData;
+
+  const sanitizedFormData = {
+    ...otherDetails, 
+    password: password || undefined, 
+    age: parseInt(age, 10), 
+  };
     facade.updateUser(sanitizedFormData)
       .then((updatedUser) => {
         setUser(sanitizedFormData);
@@ -82,7 +91,7 @@ const Profile = () => {
     return (
       <ProfileContainer>
         <ProfileContent>
-          <h3 style={{ color: "red" }}>Error: User data is missing!</h3>
+        <ErrorMessage>Error: User data is missing!</ErrorMessage>
         </ProfileContent>
       </ProfileContainer>
     );

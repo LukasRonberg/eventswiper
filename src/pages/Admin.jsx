@@ -6,6 +6,8 @@ import CreateEvent from "../../components/Admin/CreateEvent";
 import UpdateEvent from "../../components/Admin/UpdateEvent";
 import { PrimaryButton, SecondaryButton } from "../util/buttons";
 
+import CreateEventEksempel from "../../components/Admin/CreateEventEksempel";
+
 const AdminContainer = styled.div`
   padding: 20px;
   background-color: ${({ theme }) => theme.colors.background};

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
-import React from "react";
+import {useState} from "react";
 import { PrimaryButton, SecondaryButton } from "../../src/util/buttons";
 import Popup from "./Popup";
 
@@ -18,7 +18,7 @@ const Select = styled.select`
 
 
 function UpdateEvent({ onClose, onUpdate, existingData }) {
-  const [formData, setFormData] = React.useState(existingData);
+  const [formData, setFormData] = useState(existingData);
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
