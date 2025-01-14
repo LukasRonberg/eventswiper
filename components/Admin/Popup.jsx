@@ -31,15 +31,16 @@ const CloseButton = styled.button`
   float: right;
 `;
 
-function Popup({ onClose, children }) {
+function Popup({ onClose, children}) {
   return (
-    <PopupOverlay>
-      <PopupContent>
+    <PopupOverlay onClick={onClose}>
+      <PopupContent onClick={(event) => event.stopPropagation()}>
         <CloseButton onClick={onClose}>X</CloseButton>
         {children}
       </PopupContent>
     </PopupOverlay>
   );
 }
+
 
 export default Popup;

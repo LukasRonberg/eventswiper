@@ -15,7 +15,9 @@ import Forum from './pages/Forum.jsx';
 import LogIn from './pages/Login.jsx';
 import Admin from './pages/Admin.jsx';
 
-const router = createBrowserRouter(
+
+
+const router = createBrowserRouter( 
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       {/* Home Route */}
